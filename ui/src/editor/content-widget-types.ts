@@ -26,13 +26,22 @@ export interface ContentWidgetInsertTarget {
   range?: Range
 }
 
-export type ContentWidgetEditorFieldType = 'text' | 'textarea' | 'select' | 'checkbox' | 'attachment' | 'list'
+export type ContentWidgetEditorFieldType =
+  | 'text'
+  | 'textarea'
+  | 'select'
+  | 'checkbox'
+  | 'attachment'
+  | 'color'
+  | 'icon'
+  | 'list'
 export type ContentWidgetEditorFieldSource = 'attribute' | 'innerHTML' | 'children'
 export type ContentWidgetEditorListItemFieldSource = 'attribute' | 'content'
 
 export interface ContentWidgetEditorFieldOption {
   label: string
   value: string
+  icon?: string
 }
 
 export interface ContentWidgetEditorListItemField {

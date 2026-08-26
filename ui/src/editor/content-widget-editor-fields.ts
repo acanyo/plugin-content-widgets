@@ -2,6 +2,7 @@ import type {
   ContentWidgetEditorField,
   ContentWidgetEditorListItemField,
 } from './content-widget-types'
+import { contentWidgetIconDefinitions } from '@xhhao/content-widgets'
 
 const contentField = (label = '内容', placeholder = '输入组件内容'): ContentWidgetEditorField => ({
   name: 'innerHTML',
@@ -125,11 +126,77 @@ const buttonTypeOptions = [
   { label: '幽灵', value: 'ghost' },
 ]
 
+const buttonShapeOptions = [
+  { label: '小圆角', value: 'square' },
+  { label: '圆角', value: 'rounded' },
+  { label: '胶囊', value: 'pill' },
+]
+
+const targetOptions = [
+  { label: '当前窗口', value: '_self' },
+  { label: '新窗口', value: '_blank' },
+]
+
+const iconPositionOptions = [
+  { label: '不显示', value: 'none' },
+  { label: '文字前', value: 'before' },
+  { label: '文字后', value: 'after' },
+]
+
+const contentWidgetIconOptions = contentWidgetIconDefinitions.map((icon) => ({
+  label: icon.label,
+  value: icon.value,
+  icon: icon.svg,
+}))
+
+const admonitionTypeOptions = [
+  { label: '提醒', value: 'tip' },
+  { label: '信息', value: 'info' },
+  { label: '警告', value: 'warning' },
+  { label: '危险', value: 'danger' },
+  { label: '成功', value: 'success' },
+  { label: '问题', value: 'question' },
+  { label: '示例', value: 'example' },
+  { label: '引用', value: 'quote' },
+  { label: 'Bug', value: 'bug' },
+]
+
+const linkCardPresetOptions = [
+  { label: 'GitHub', value: 'github' },
+  { label: 'Bilibili', value: 'bilibili' },
+  { label: 'Behance', value: 'behance' },
+  { label: '小红书', value: 'xiaohongshu' },
+  { label: '新片场', value: 'xinpianchang' },
+  { label: 'Dribbble', value: 'dribbble' },
+  { label: 'ArtStation', value: 'artstation' },
+  { label: 'Pinterest', value: 'pinterest' },
+  { label: '官方网站', value: 'website' },
+  { label: '文档', value: 'docs' },
+  { label: '下载', value: 'download' },
+  { label: '在线工具', value: 'tools' },
+  { label: '游戏', value: 'game' },
+  { label: '社区', value: 'community' },
+  { label: '问题反馈', value: 'feedback' },
+]
+
 export const contentWidgetEditorFields: Record<string, ContentWidgetEditorField[]> = {
   'xhhao-com-alert': [
     attrField('type', '状态', 'select', undefined, statusOptions),
     attrField('title', '标题', 'text', '提醒'),
     attrField('icon', '自定义图标', 'textarea', 'SVG 字符串或图片 URL'),
+    contentField('正文', '这里写提示内容。'),
+  ],
+  'xhhao-com-admonition': [
+    attrField('type', '类型', 'select', undefined, admonitionTypeOptions),
+    attrField('title', '自定义标题', 'text', '留空时跟随类型'),
+    attrField('show-title', '显示标题', 'checkbox'),
+    attrField('collapsible', '允许折叠', 'checkbox'),
+    attrField('default-open', '默认展开', 'checkbox'),
+    attrField('accent-color', '强调色', 'color', '留空时跟随类型'),
+    attrField('background-color', '背景色', 'color', '留空时跟随类型'),
+    attrField('text-color', '文字色', 'color', '留空时跟随类型'),
+    attrField('icon-name', '常用图标', 'icon', undefined, contentWidgetIconOptions),
+    attrField('icon', '自定义图标', 'text', 'SVG、Emoji 或图片 URL；填写后覆盖常用图标'),
     contentField('正文', '这里写提示内容。'),
   ],
   'xhhao-com-tip': [
@@ -247,6 +314,23 @@ export const contentWidgetEditorFields: Record<string, ContentWidgetEditorField[
     attrField('left', '左侧内容', 'textarea', '之前的内容'),
     attrField('right', '右侧内容', 'textarea', '之后的内容'),
   ],
+  'xhhao-com-link-card': [
+    attrField('preset', '常用预设', 'select', undefined, linkCardPresetOptions),
+    attrField('label', '顶部标签', 'text', '留空时跟随预设'),
+    attrField('title', '标题', 'text', '留空时跟随预设'),
+    attrField('description', '说明', 'textarea', '留空时跟随预设'),
+    attrField('href', '链接', 'text', 'https://example.com'),
+    attrField('target', '打开方式', 'select', undefined, targetOptions),
+    attrField('accent-color', '强调色', 'color', '留空时跟随预设'),
+    attrField('background-color', '背景色', 'color', '留空时跟随预设'),
+    attrField('text-color', '文字色', 'color', '留空时跟随预设'),
+    attrField('show-image', '显示右侧预览图', 'checkbox'),
+    attrField('image', '预览图 URL', 'attachment', 'https://example.com/preview.jpg', undefined, [
+      'image/*',
+    ]),
+    attrField('icon-name', '常用图标', 'icon', undefined, contentWidgetIconOptions),
+    attrField('icon', '自定义图标', 'text', 'SVG、Emoji 或图片 URL；填写后覆盖常用图标'),
+  ],
   'xhhao-com-copy': [
     attrField('prompt', '提示符', 'text', '$'),
     contentField('代码', 'pnpm install'),
@@ -339,6 +423,18 @@ export const contentWidgetEditorFields: Record<string, ContentWidgetEditorField[
     attrField('target', '打开方式', 'text', '_blank'),
     attrField('icon', '图标', 'textarea', 'SVG 字符串或图片 URL'),
     contentField('按钮文本', '访问链接'),
+  ],
+  'xhhao-com-action-button': [
+    attrField('shape', '圆角', 'select', undefined, buttonShapeOptions),
+    attrField('href', '链接', 'text', 'https://example.com'),
+    attrField('target', '打开方式', 'select', undefined, targetOptions),
+    attrField('gradient-start', '渐变起始色', 'color', '#0ea5ff'),
+    attrField('gradient-end', '渐变结束色', 'color', '#1d3fd8'),
+    attrField('text-color', '文字与图标色', 'color', '#ffffff'),
+    attrField('icon-position', '图标位置', 'select', undefined, iconPositionOptions),
+    attrField('icon-name', '常用图标', 'icon', undefined, contentWidgetIconOptions),
+    attrField('icon', '自定义图标', 'text', 'SVG、Emoji 或图片 URL；填写后覆盖常用图标'),
+    contentField('按钮文字', '前往访问'),
   ],
   'xhhao-com-task-list': [
     listField({

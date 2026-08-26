@@ -1,4 +1,6 @@
 import Alert from "../components/Alert.svelte";
+import ActionButton from "../components/ActionButton.svelte";
+import Admonition from "../components/Admonition.svelte";
 import Annotation from "../components/Annotation.svelte";
 import Badge from "../components/Badge.svelte";
 import Blur from "../components/Blur.svelte";
@@ -11,6 +13,7 @@ import Copy from "../components/Copy.svelte";
 import EmojiClock from "../components/EmojiClock.svelte";
 import Folding from "../components/Folding.svelte";
 import Key from "../components/Key.svelte";
+import LinkCard from "../components/LinkCard.svelte";
 import Note from "../components/Note.svelte";
 import Pdf from "../components/Pdf.svelte";
 import Pic from "../components/Pic.svelte";
@@ -40,6 +43,23 @@ export function mountCustomElements(root: ParentNode = document) {
 
   root.querySelectorAll<HTMLElement>("xhhao-com-button").forEach((element) => {
     mountComponent(element, Button, { ...parseProps(element), content: innerHtml(element) }, true);
+  });
+
+  root.querySelectorAll<HTMLElement>("xhhao-com-action-button").forEach((element) => {
+    mountComponent(
+      element,
+      ActionButton,
+      { ...parseProps(element), content: innerHtml(element) },
+      true,
+    );
+  });
+
+  root.querySelectorAll<HTMLElement>("xhhao-com-admonition").forEach((element) => {
+    mountComponent(element, Admonition, { ...parseProps(element), content: innerHtml(element) });
+  });
+
+  root.querySelectorAll<HTMLElement>("xhhao-com-link-card").forEach((element) => {
+    mountComponent(element, LinkCard, parseProps(element));
   });
 
   root.querySelectorAll<HTMLElement>("xhhao-com-tab").forEach((element) => {

@@ -2,6 +2,10 @@ import "./styles/index.scss";
 import { mountCustomElements } from "./mount/mountCustomElements";
 
 export { mountCustomElements };
+export {
+  contentWidgetIconDefinitions,
+  contentWidgetIcons,
+} from "./components/icons/contentWidgetIcons";
 
 export interface XhhaoComContentWidgetsApi {
   mount: typeof mountCustomElements;

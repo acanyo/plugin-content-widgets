@@ -1,0 +1,71 @@
+.xhhao-com-admonition {
+  margin: 1em 0;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--xhhao-com-admonition-accent) 34%, transparent);
+  border-inline-start: 0.32em solid var(--xhhao-com-admonition-accent);
+  border-radius: 0.72em;
+  background: var(--xhhao-com-admonition-bg);
+  color: var(--xhhao-com-admonition-text);
+  font-size: 0.94em;
+  box-shadow: 0 0.3em 1em color-mix(in srgb, var(--xhhao-com-admonition-accent) 10%, transparent);
+
+  .xhhao-com-admonition-title {
+    display: flex;
+    align-items: center;
+    gap: 0.55em;
+    min-height: 2.8em;
+    margin: 0;
+    padding: 0.65em 0.9em;
+    background: color-mix(in srgb, var(--xhhao-com-admonition-accent) 12%, var(--xhhao-com-admonition-bg));
+    color: var(--xhhao-com-admonition-accent);
+    line-height: 1.4;
+  }
+
+  summary.xhhao-com-admonition-title {
+    cursor: pointer;
+    list-style: none;
+
+    &::-webkit-details-marker {
+      display: none;
+    }
+  }
+
+  .xhhao-com-admonition-icon {
+    display: grid;
+    place-items: center;
+    flex: 0 0 auto;
+    width: 1.15em;
+    height: 1.15em;
+
+    svg,
+    img {
+      display: block;
+      width: 1.15em;
+      height: 1.15em;
+      object-fit: contain;
+    }
+  }
+
+  .xhhao-com-admonition-chevron {
+    margin-inline-start: auto;
+    font-size: 1.25em;
+    transition: transform 0.18s ease;
+  }
+
+  details[open] .xhhao-com-admonition-chevron {
+    transform: rotate(180deg);
+  }
+
+  .xhhao-com-admonition-body {
+    padding: 0.85em 1em;
+    line-height: 1.72;
+
+    > :first-child {
+      margin-top: 0;
+    }
+
+    > :last-child {
+      margin-bottom: 0;
+    }
+  }
+}

@@ -1,0 +1,63 @@
+.xhhao-com-action-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45em;
+  max-width: 100%;
+  padding: 0.58em 1em;
+  border-radius: 0.75em;
+  background: linear-gradient(
+    105deg,
+    var(--xhhao-com-action-start, #0ea5ff),
+    var(--xhhao-com-action-end, #1d3fd8)
+  );
+  color: var(--xhhao-com-action-text, #fff);
+  font-size: 0.92em;
+  font-weight: 750;
+  line-height: 1.35;
+  text-decoration: none;
+  box-shadow: 0 0.45em 1.1em color-mix(in srgb, var(--xhhao-com-action-start, #0ea5ff) 24%, transparent);
+  transition: transform 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease;
+
+  &:hover {
+    color: var(--xhhao-com-action-text, #fff);
+    filter: saturate(1.08) brightness(1.03);
+    transform: translateY(-1px);
+    box-shadow: 0 0.7em 1.45em color-mix(in srgb, var(--xhhao-com-action-start, #0ea5ff) 32%, transparent);
+  }
+
+  &.xhhao-com-action-button-shape-square {
+    border-radius: 0.3em;
+  }
+
+  &.xhhao-com-action-button-shape-rounded {
+    border-radius: 0.75em;
+  }
+
+  &.xhhao-com-action-button-shape-pill {
+    padding-inline: 1.15em;
+    border-radius: 999px;
+  }
+
+  .xhhao-com-action-button-icon {
+    display: grid;
+    place-items: center;
+    flex: 0 0 auto;
+    width: 1em;
+    height: 1em;
+    color: currentcolor;
+
+    svg,
+    img {
+      display: block;
+      width: 1em;
+      height: 1em;
+      object-fit: contain;
+    }
+  }
+
+  .xhhao-com-action-button-content {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
