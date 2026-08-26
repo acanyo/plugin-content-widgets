@@ -44,6 +44,37 @@
 - `title`：标题。
 - `icon`：自定义图标，支持 SVG 字符串或图片 URL。
 
+### xhhao-com-button
+
+行内按钮链接，支持渐变颜色、三档圆角、内置或自定义图标，并兼容原有按钮类型。
+
+```html
+<xhhao-com-button
+  href="https://example.com"
+  target="_blank"
+  type="primary"
+  shape="pill"
+  gradient-start="#0ea5ff"
+  gradient-end="#1d3fd8"
+  text-color="#ffffff"
+  icon-name="external-link"
+  icon-position="after"
+>
+  前往访问
+</xhhao-com-button>
+```
+
+参数：
+
+- `type`：兼容原有 `primary`、`secondary`、`ghost`。
+- `shape`：圆角，可选 `square`、`rounded`、`pill`。
+- `gradient-start`、`gradient-end`：渐变起止色。
+- `text-color`：文字与图标颜色。
+- `icon-name`：内置常用图标；设为 `none` 时不显示图标。
+- `icon-position`：图标位置，可选 `before`、`after`、`none`。
+- `icon`：自定义 SVG、Emoji 或图片 URL，填写后覆盖内置图标。
+- `target`：链接打开方式，支持 `_self`、`_blank`。
+
 ### xhhao-com-tab
 
 标签页，用于把内容切分到多个页签中。

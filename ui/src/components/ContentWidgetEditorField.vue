@@ -46,6 +46,15 @@ function primitiveCheckedValue() {
   return Boolean(primitiveValue())
 }
 
+function primitiveColorValue() {
+  const value = primitiveTextValue()
+  return /^#[\da-f]{6}$/i.test(value) ? value : '#000000'
+}
+
+function selectPrimitiveValue(value: string) {
+  emitFieldValue(value)
+}
+
 function listValue() {
   const value = getContentWidgetFieldValue(props.widget, props.field)
   return Array.isArray(value) ? value : []
@@ -79,7 +88,11 @@ function onAttachmentSelect(attachments: AttachmentLike[]) {
   if (typeof attachment === 'string') {
     url = attachment
   } else {
-    url = (attachment as any).status?.permalink || (attachment as any).url || ''
+    const attachmentValue = attachment as {
+      status?: { permalink?: string }
+      url?: string
+    }
+    url = attachmentValue.status?.permalink || attachmentValue.url || ''
   }
 
   if (activeAttachmentItemIndex.value !== null && activeAttachmentField.value) {
@@ -213,7 +226,8 @@ function moveItem(index: number, offset: number) {
     class="content-widget-editor-field"
     :class="{ 'content-widget-editor-field--inline': inline }"
   >
-    <label
+    <component
+      :is="field.type === 'icon' ? 'div' : 'label'"
       v-if="field.type !== 'list'"
       class="content-widget-editor-field__label"
       :class="{ 'content-widget-editor-field__label--check': field.type === 'checkbox' }"
@@ -229,6 +243,52 @@ function moveItem(index: number, offset: number) {
           {{ option.label }}
         </option>
       </select>
+
+      <span v-else-if="field.type === 'color'" class="content-widget-editor-field__color">
+        <input
+          type="color"
+          :value="primitiveColorValue()"
+          :aria-label="field.label"
+          @input="handlePrimitiveInput"
+        />
+        <input
+          type="text"
+          :value="primitiveTextValue()"
+          :placeholder="field.placeholder"
+          @input="handlePrimitiveInput"
+        />
+      </span>
+
+      <span
+        v-else-if="field.type === 'icon'"
+        class="content-widget-editor-field__icons"
+        role="listbox"
+        :aria-label="field.label"
+      >
+        <button
+          v-for="option in field.options || []"
+          :key="option.value"
+          type="button"
+          :class="{ 'is-active': primitiveTextValue() === option.value }"
+          :title="option.label"
+          :aria-label="option.label"
+          :aria-selected="primitiveTextValue() === option.value"
+          @click="selectPrimitiveValue(option.value)"
+        >
+          <svg
+            v-if="option.icon"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+            v-html="option.icon"
+          />
+          <span v-else>{{ option.label }}</span>
+        </button>
+      </span>
 
       <textarea
         v-else-if="field.type === 'textarea'"
@@ -269,7 +329,7 @@ function moveItem(index: number, offset: number) {
         :placeholder="field.placeholder"
         @input="handlePrimitiveInput"
       />
-    </label>
+    </component>
 
     <component :is="inline ? 'span' : 'div'" v-else class="content-widget-editor-list">
       <component :is="inline ? 'span' : 'div'" class="content-widget-editor-list__head">
@@ -424,6 +484,47 @@ function moveItem(index: number, offset: number) {
   display: flex;
   gap: 6px;
   align-items: center;
+}
+
+.content-widget-editor-field__color {
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr);
+  gap: 7px;
+  align-items: center;
+}
+
+.content-widget-editor-field__color input[type='color'] {
+  width: 42px;
+  height: 32px;
+  padding: 3px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  background: #fff;
+  cursor: pointer;
+}
+
+.content-widget-editor-field__icons {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(34px, 1fr));
+  gap: 5px;
+}
+
+.content-widget-editor-field__icons button {
+  height: 34px;
+  padding: 0;
+  background: #f8fafc;
+}
+
+.content-widget-editor-field__icons button.is-active {
+  border-color: #2563eb;
+  background: #eff6ff;
+  color: #2563eb;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+}
+
+.content-widget-editor-field__icons svg {
+  width: 18px;
+  height: 18px;
 }
 
 .content-widget-editor-field__attachment input {

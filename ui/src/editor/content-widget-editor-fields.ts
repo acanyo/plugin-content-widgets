@@ -2,6 +2,7 @@ import type {
   ContentWidgetEditorField,
   ContentWidgetEditorListItemField,
 } from './content-widget-types'
+import { buttonIconDefinitions } from '@xhhao/content-widgets'
 
 const contentField = (label = '内容', placeholder = '输入组件内容'): ContentWidgetEditorField => ({
   name: 'innerHTML',
@@ -124,6 +125,29 @@ const buttonTypeOptions = [
   { label: '次要', value: 'secondary' },
   { label: '幽灵', value: 'ghost' },
 ]
+
+const buttonShapeOptions = [
+  { label: '小圆角', value: 'square' },
+  { label: '圆角', value: 'rounded' },
+  { label: '胶囊', value: 'pill' },
+]
+
+const buttonTargetOptions = [
+  { label: '当前窗口', value: '_self' },
+  { label: '新窗口', value: '_blank' },
+]
+
+const buttonIconPositionOptions = [
+  { label: '不显示', value: 'none' },
+  { label: '文字前', value: 'before' },
+  { label: '文字后', value: 'after' },
+]
+
+const buttonIconOptions = buttonIconDefinitions.map((icon) => ({
+  label: icon.label,
+  value: icon.value,
+  icon: icon.svg,
+}))
 
 export const contentWidgetEditorFields: Record<string, ContentWidgetEditorField[]> = {
   'xhhao-com-alert': [
@@ -335,10 +359,16 @@ export const contentWidgetEditorFields: Record<string, ContentWidgetEditorField[
   ],
   'xhhao-com-button': [
     attrField('type', '类型', 'select', undefined, buttonTypeOptions),
+    attrField('shape', '圆角', 'select', undefined, buttonShapeOptions),
     attrField('href', '链接', 'text', 'https://www.xhhao.com'),
-    attrField('target', '打开方式', 'text', '_blank'),
-    attrField('icon', '图标', 'textarea', 'SVG 字符串或图片 URL'),
-    contentField('按钮文本', '访问链接'),
+    attrField('target', '打开方式', 'select', undefined, buttonTargetOptions),
+    attrField('gradient-start', '渐变起始色', 'color', '#0ea5ff'),
+    attrField('gradient-end', '渐变结束色', 'color', '#1d3fd8'),
+    attrField('text-color', '文字与图标色', 'color', '#ffffff'),
+    attrField('icon-position', '图标位置', 'select', undefined, buttonIconPositionOptions),
+    attrField('icon-name', '常用图标', 'icon', undefined, buttonIconOptions),
+    attrField('icon', '自定义图标', 'text', 'SVG、Emoji 或图片 URL；填写后覆盖常用图标'),
+    contentField('按钮文本', '前往访问'),
   ],
   'xhhao-com-task-list': [
     listField({
