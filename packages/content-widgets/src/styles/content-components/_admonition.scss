@@ -1,4 +1,5 @@
 .xhhao-com-admonition {
+  box-sizing: border-box;
   margin: 1em 0;
   overflow: hidden;
   border: 1px solid color-mix(in srgb, var(--xhhao-com-admonition-accent) 34%, transparent);
@@ -9,16 +10,35 @@
   font-size: 0.94em;
   box-shadow: 0 0.3em 1em color-mix(in srgb, var(--xhhao-com-admonition-accent) 10%, transparent);
 
+  details {
+    display: block !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    color: inherit !important;
+  }
+
   .xhhao-com-admonition-title {
-    display: flex;
+    display: flex !important;
     align-items: center;
     gap: 0.55em;
     min-height: 2.8em;
-    margin: 0;
-    padding: 0.65em 0.9em;
-    background: color-mix(in srgb, var(--xhhao-com-admonition-accent) 12%, var(--xhhao-com-admonition-bg));
-    color: var(--xhhao-com-admonition-accent);
+    margin: 0 !important;
+    padding: 0.65em 0.9em !important;
+    border: 0 !important;
+    background: color-mix(in srgb, var(--xhhao-com-admonition-accent) 12%, var(--xhhao-com-admonition-bg)) !important;
+    color: var(--xhhao-com-admonition-accent) !important;
     line-height: 1.4;
+
+    strong {
+      display: inline !important;
+      margin: 0 !important;
+      color: inherit !important;
+      font: inherit;
+      font-weight: 700;
+    }
   }
 
   summary.xhhao-com-admonition-title {
@@ -57,8 +77,34 @@
   }
 
   .xhhao-com-admonition-body {
-    padding: 0.85em 1em;
+    margin: 0 !important;
+    padding: 0.85em 1em !important;
+    background: var(--xhhao-com-admonition-bg) !important;
+    color: var(--xhhao-com-admonition-text) !important;
     line-height: 1.72;
+
+    a {
+      color: var(--xhhao-com-admonition-accent) !important;
+    }
+
+    code {
+      padding: 0.12em 0.35em;
+      border-radius: 0.3em;
+      background: color-mix(in srgb, var(--xhhao-com-admonition-accent) 12%, transparent);
+      color: inherit;
+    }
+
+    pre {
+      overflow-x: auto;
+      padding: 0.75em;
+      border-radius: 0.5em;
+      background: color-mix(in srgb, var(--xhhao-com-admonition-text) 9%, var(--xhhao-com-admonition-bg));
+
+      code {
+        padding: 0;
+        background: transparent;
+      }
+    }
 
     > :first-child {
       margin-top: 0;

@@ -275,8 +275,9 @@ function moveItem(index: number, offset: number) {
           :aria-selected="primitiveTextValue() === option.value"
           @click="selectPrimitiveValue(option.value)"
         >
+          <span v-if="option.value === 'none'">无图标</span>
           <svg
-            v-if="option.icon"
+            v-else-if="option.icon"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
@@ -462,8 +463,7 @@ function moveItem(index: number, offset: number) {
 }
 
 .content-widget-editor-field--inline {
-  display: inline-grid;
-  width: min(340px, calc(100vw - 48px));
+  width: 100%;
 }
 
 .content-widget-editor-field__label {
@@ -513,6 +513,11 @@ function moveItem(index: number, offset: number) {
   height: 34px;
   padding: 0;
   background: #f8fafc;
+}
+
+.content-widget-editor-field__icons button[aria-label='不显示'] {
+  grid-column: span 2;
+  padding-inline: 8px;
 }
 
 .content-widget-editor-field__icons button.is-active {
@@ -615,6 +620,18 @@ function moveItem(index: number, offset: number) {
   font: inherit;
   font-weight: 400;
   outline: none;
+}
+
+.content-widget-editor-field input[type='text'],
+.content-widget-editor-field textarea {
+  caret-color: #2563eb;
+  cursor: text;
+  pointer-events: auto;
+  user-select: text;
+}
+
+.content-widget-editor-field select {
+  cursor: pointer;
 }
 
 .content-widget-editor-field input[type='text'],

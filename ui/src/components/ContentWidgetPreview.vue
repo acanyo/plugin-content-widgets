@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { NodeSelection, NodeViewWrapper, nodeViewProps } from '@halo-dev/richtext-editor'
+import { NodeViewWrapper, nodeViewProps } from '@halo-dev/richtext-editor'
 import { computed } from 'vue'
 import { getContentWidgetEditorFields } from '@/editor/content-widget-editor-fields'
 import { getContentWidgetDefinitionByTagName } from '@/editor/content-widget-registry'
@@ -45,8 +45,6 @@ function updateWidget(nextWidget: ContentWidgetNodeAttrs) {
       ...props.node.attrs,
       ...nextAttrs,
     })
-    tr.setSelection(NodeSelection.create(tr.doc, position))
-
     return true
   })
 }
@@ -93,6 +91,7 @@ function updateWidget(nextWidget: ContentWidgetNodeAttrs) {
           :widget="widget"
           :field="field"
           :inline="isInline"
+          :class="{ 'content-widget-node__field--half': field.layout === 'half' }"
           @update="updateWidget"
         />
       </template>
@@ -135,6 +134,7 @@ function updateWidget(nextWidget: ContentWidgetNodeAttrs) {
 
 .content-widget-node__editor {
   display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px;
   margin-top: 10px;
   padding: 12px;
@@ -149,7 +149,7 @@ function updateWidget(nextWidget: ContentWidgetNodeAttrs) {
   z-index: 20;
   top: calc(100% + 8px);
   left: 0;
-  width: min(380px, calc(100vw - 48px));
+  width: min(560px, calc(100vw - 48px));
   margin-top: 0;
 }
 
@@ -161,6 +161,22 @@ function updateWidget(nextWidget: ContentWidgetNodeAttrs) {
   min-width: 0;
   padding-bottom: 8px;
   border-bottom: 1px solid #eef2f7;
+}
+
+.content-widget-node__editor-head,
+.content-widget-node__editor-empty,
+.content-widget-node__editor > :not(.content-widget-node__field--half) {
+  grid-column: 1 / -1;
+}
+
+@media (max-width: 640px) {
+  .content-widget-node__editor {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .content-widget-node__field--half {
+    grid-column: 1 / -1;
+  }
 }
 
 .content-widget-node__editor-head strong {

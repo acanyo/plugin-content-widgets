@@ -72,6 +72,7 @@ export interface ContentWidgetEditorField {
   placeholder?: string
   options?: ContentWidgetEditorFieldOption[]
   accepts?: string[]
+  layout?: 'full' | 'half'
   childTagName?: string
   wrapperTagName?: string
   addLabel?: string

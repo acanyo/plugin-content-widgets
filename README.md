@@ -46,7 +46,7 @@
 
 ### xhhao-com-admonition
 
-独立的增强提示框，支持折叠、配色和常用图标，不会改变原有 `xhhao-com-alert`。
+独立的增强提示框，正文支持 GitHub Flavored Markdown，同时支持折叠、配色和常用图标，不会改变原有 `xhhao-com-alert`。
 
 ```html
 <xhhao-com-admonition type="success" show-title collapsible default-open>

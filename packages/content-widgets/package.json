@@ -48,5 +48,8 @@
     "typescript": "~5.8.3",
     "unocss": "^66.5.9",
     "vite": "^7.2.7"
+  },
+  "dependencies": {
+    "marked": "^18.0.11"
   }
 }

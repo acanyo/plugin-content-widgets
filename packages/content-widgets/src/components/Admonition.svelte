@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { marked } from "marked";
   import { contentWidgetIcons } from "./icons/contentWidgetIcons";
 
   type AdmonitionType = "tip" | "info" | "warning" | "danger" | "success" | "question" | "example" | "quote" | "bug";
@@ -18,9 +19,9 @@
   let {
     type = "tip",
     title,
-    showTitle = true,
+    showTitle = false,
     collapsible = false,
-    defaultOpen = true,
+    defaultOpen = false,
     accentColor,
     backgroundColor,
     textColor,
@@ -49,6 +50,13 @@
   let builtInIcon = $derived(contentWidgetIcons[iconName || preset.icon] || "");
   let customIconIsSvg = $derived(customIcon.startsWith("<svg"));
   let iconIsImage = $derived(Boolean(customIcon && /^(?:https?:)?\/\/|^\//i.test(customIcon)));
+  let renderedContent = $derived(
+    marked.parse(content.replace(/^[\u200B-\u200F\uFEFF]/, ""), {
+      async: false,
+      breaks: true,
+      gfm: true,
+    }),
+  );
 </script>
 
 <aside
@@ -66,7 +74,7 @@
         <strong>{title || preset.title}</strong>
         <span class="xhhao-com-admonition-chevron" aria-hidden="true">⌄</span>
       </summary>
-      <div class="xhhao-com-admonition-body">{@html content}</div>
+      <div class="xhhao-com-admonition-body">{@html renderedContent}</div>
     </details>
   {:else}
     {#if showTitle}
@@ -77,6 +85,6 @@
         <strong>{title || preset.title}</strong>
       </div>
     {/if}
-    <div class="xhhao-com-admonition-body">{@html content}</div>
+    <div class="xhhao-com-admonition-body">{@html renderedContent}</div>
   {/if}
 </aside>
