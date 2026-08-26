@@ -149,6 +149,7 @@ export const contentWidgetDefinitions: ContentWidgetDefinition[] = [
       href: 'https://github.com',
       target: '_blank',
       'show-image': 'false',
+      'auto-metadata': 'true',
     },
     keywords: ['link', 'card', 'github', 'bilibili', 'behance', '外链', '卡片'],
   },

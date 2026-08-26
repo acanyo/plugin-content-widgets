@@ -12,6 +12,7 @@ import type {
   ContentWidgetEditorFieldValue,
   ContentWidgetNodeAttrs,
 } from '@/editor/content-widget-types'
+import { applyLinkMetadata, readLinkMetadata } from '@/editor/link-metadata'
 import { type AttachmentLike } from '@halo-dev/ui-shared'
 
 const props = defineProps<{
@@ -27,9 +28,22 @@ const emit = defineEmits<{
 const attachmentSelectorVisible = ref(false)
 const activeAttachmentField = ref<ContentWidgetEditorField | ContentWidgetEditorListItemField | null>(null)
 const activeAttachmentItemIndex = ref<number | null>(null)
+const metadataLoading = ref(false)
+const metadataMessage = ref('')
+let metadataRequestId = 0
 
 function emitFieldValue(value: ContentWidgetEditorFieldValue) {
-  emit('update', setContentWidgetFieldValue(props.widget, props.field, value))
+  if (props.field.metadataRole) {
+    metadataRequestId += 1
+    metadataLoading.value = false
+    metadataMessage.value = ''
+  }
+
+  const nextWidget = setContentWidgetFieldValue(props.widget, props.field, value)
+  if (props.field.metadataRole === 'manual') {
+    delete nextWidget.attributes['auto-metadata']
+  }
+  emit('update', nextWidget)
 }
 
 function primitiveValue() {
@@ -53,6 +67,53 @@ function primitiveColorValue() {
 
 function selectPrimitiveValue(value: string) {
   emitFieldValue(value)
+}
+
+function metadataAutoEnabled() {
+  const autoFieldName = props.field.metadata?.autoField
+  if (!autoFieldName) return false
+  const value = props.widget.attributes?.[autoFieldName]
+  return value === '' || value === 'true'
+}
+
+async function fetchMetadata(force = false) {
+  if (!props.field.metadata || (!force && !metadataAutoEnabled())) return
+
+  const href = primitiveTextValue().trim()
+  if (!href || href === '#') return
+
+  const requestId = ++metadataRequestId
+  metadataLoading.value = true
+  metadataMessage.value = '正在读取网站信息…'
+
+  try {
+    const metadata = await readLinkMetadata(href)
+    if (requestId !== metadataRequestId) return
+    const attributes = applyLinkMetadata(
+      props.widget.attributes,
+      metadata,
+      href,
+      props.field.metadata.autoField || 'auto-metadata',
+    )
+
+    emit('update', {
+      ...props.widget,
+      attributes,
+    })
+
+    metadataMessage.value = metadata.source === 'fallback'
+      ? '目标网站限制了自动读取，已填入平台默认信息；你仍可手工修改。'
+      : metadata.imageUrl
+        ? '已读取标题、说明、网站图标和预览图。'
+        : '已读取标题、说明和网站图标。'
+  } catch (error) {
+    if (requestId !== metadataRequestId) return
+    metadataMessage.value = error instanceof Error ? error.message : '无法读取该网站信息。'
+  } finally {
+    if (requestId === metadataRequestId) {
+      metadataLoading.value = false
+    }
+  }
 }
 
 function listValue() {
@@ -323,6 +384,28 @@ function moveItem(index: number, offset: number) {
         </button>
       </component>
 
+      <component
+        :is="inline ? 'span' : 'div'"
+        v-else-if="field.metadata"
+        class="content-widget-editor-field__metadata"
+      >
+        <input
+          type="text"
+          :value="primitiveTextValue()"
+          :placeholder="field.placeholder"
+          @input="handlePrimitiveInput"
+          @blur="fetchMetadata()"
+        />
+        <button
+          type="button"
+          class="content-widget-editor-field__metadata-btn"
+          :disabled="metadataLoading"
+          @click.stop.prevent="fetchMetadata(true)"
+        >
+          {{ metadataLoading ? '读取中…' : field.metadata.buttonLabel || '读取网站信息' }}
+        </button>
+      </component>
+
       <input
         v-else
         type="text"
@@ -330,6 +413,10 @@ function moveItem(index: number, offset: number) {
         :placeholder="field.placeholder"
         @input="handlePrimitiveInput"
       />
+
+      <p v-if="field.metadata && metadataMessage" class="content-widget-editor-field__metadata-message">
+        {{ metadataMessage }}
+      </p>
     </component>
 
     <component :is="inline ? 'span' : 'div'" v-else class="content-widget-editor-list">
@@ -484,6 +571,31 @@ function moveItem(index: number, offset: number) {
   display: flex;
   gap: 6px;
   align-items: center;
+}
+
+.content-widget-editor-field__metadata {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.content-widget-editor-field__metadata input {
+  flex: 1;
+  min-width: 0;
+}
+
+.content-widget-editor-field__metadata-btn {
+  flex-shrink: 0;
+  min-width: 92px;
+  white-space: nowrap;
+}
+
+.content-widget-editor-field__metadata-message {
+  margin: 0;
+  color: #64748b;
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 1.45;
 }
 
 .content-widget-editor-field__color {

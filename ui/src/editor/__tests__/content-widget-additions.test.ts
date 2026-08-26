@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest'
 import { mountCustomElements } from '@xhhao/content-widgets'
 import { contentWidgetEditorFields } from '../content-widget-editor-fields'
 import { contentWidgetDefinitions } from '../content-widget-registry'
+import { applyLinkMetadata } from '../link-metadata'
 
 describe('independent content widget additions', () => {
   it('leaves the original button definition unchanged', () => {
@@ -72,5 +73,39 @@ describe('independent content widget additions', () => {
     expect(document.querySelector('.xhhao-com-admonition-body strong')?.textContent).toBe('Markdown')
     expect(document.querySelector('.xhhao-com-link-card-title')?.textContent).toContain('GitHub')
     expect(document.querySelector('.xhhao-com-link-card-icon svg')).not.toBeNull()
+  })
+
+  it('maps metadata without overwriting blank results or custom fields', () => {
+    const attributes = applyLinkMetadata(
+      {
+        href: 'https://example.com',
+        'accent-color': '#123456',
+        'auto-metadata': 'true',
+      },
+      {
+        url: 'https://github.com/acanyo/plugin-content-widgets',
+        host: 'github.com',
+        platform: 'github',
+        siteName: 'GitHub',
+        title: 'Repository title',
+        description: 'Repository description',
+        iconUrl: 'https://github.com/favicon.ico',
+        imageUrl: '',
+        source: 'page',
+      },
+      'https://example.com',
+    )
+
+    expect(attributes).toMatchObject({
+      preset: 'github',
+      title: 'Repository title',
+      description: 'Repository description',
+      'accent-color': '#123456',
+      'icon-name': 'code',
+      icon: 'https://github.com/favicon.ico',
+      'auto-metadata': 'true',
+    })
+    expect(attributes.image).toBeUndefined()
+    expect(attributes['show-image']).toBeUndefined()
   })
 })

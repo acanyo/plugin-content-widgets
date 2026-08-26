@@ -34,6 +34,11 @@ const halfField = (field: ContentWidgetEditorField): ContentWidgetEditorField =>
   layout: 'half',
 })
 
+const linkCardManualField = (field: ContentWidgetEditorField): ContentWidgetEditorField => ({
+  ...field,
+  metadataRole: 'manual',
+})
+
 const listItemAttrField = (
   name: string,
   label: string,
@@ -320,21 +325,26 @@ export const contentWidgetEditorFields: Record<string, ContentWidgetEditorField[
     attrField('right', '右侧内容', 'textarea', '之后的内容'),
   ],
   'xhhao-com-link-card': [
-    halfField(attrField('preset', '常用预设', 'select', undefined, linkCardPresetOptions)),
-    halfField(attrField('target', '打开方式', 'select', undefined, targetOptions)),
-    halfField(attrField('label', '顶部标签', 'text', '留空时跟随预设')),
-    halfField(attrField('title', '标题', 'text', '留空时跟随预设')),
-    attrField('description', '说明', 'textarea', '留空时跟随预设'),
-    attrField('href', '链接', 'text', 'https://example.com'),
-    halfField(attrField('accent-color', '强调色', 'color', '留空时跟随预设')),
-    halfField(attrField('background-color', '背景色', 'color', '留空时跟随预设')),
-    halfField(attrField('text-color', '文字色', 'color', '留空时跟随预设')),
-    halfField(attrField('show-image', '显示右侧预览图', 'checkbox')),
-    attrField('image', '预览图 URL', 'attachment', 'https://example.com/preview.jpg', undefined, [
+    linkCardManualField(halfField(attrField('preset', '常用预设', 'select', undefined, linkCardPresetOptions))),
+    linkCardManualField(halfField(attrField('target', '打开方式', 'select', undefined, targetOptions))),
+    linkCardManualField(halfField(attrField('label', '顶部标签', 'text', '留空时跟随预设'))),
+    linkCardManualField(halfField(attrField('title', '标题', 'text', '留空时跟随预设'))),
+    linkCardManualField(attrField('description', '说明', 'textarea', '留空时跟随预设')),
+    {
+      ...attrField('href', '链接', 'text', 'https://example.com'),
+      metadata: { autoField: 'auto-metadata', buttonLabel: '读取网站信息' },
+      metadataRole: 'url',
+    },
+    halfField(attrField('auto-metadata', '链接变化后自动读取', 'checkbox')),
+    linkCardManualField(halfField(attrField('accent-color', '强调色', 'color', '留空时跟随预设'))),
+    linkCardManualField(halfField(attrField('background-color', '背景色', 'color', '留空时跟随预设'))),
+    linkCardManualField(halfField(attrField('text-color', '文字色', 'color', '留空时跟随预设'))),
+    linkCardManualField(halfField(attrField('show-image', '显示右侧预览图', 'checkbox'))),
+    linkCardManualField(attrField('image', '预览图 URL', 'attachment', 'https://example.com/preview.jpg', undefined, [
       'image/*',
-    ]),
-    attrField('icon-name', '常用图标', 'icon', undefined, contentWidgetIconOptions),
-    attrField('icon', '自定义图标', 'text', 'SVG、Emoji 或图片 URL；填写后覆盖常用图标'),
+    ])),
+    linkCardManualField(attrField('icon-name', '常用图标', 'icon', undefined, contentWidgetIconOptions)),
+    linkCardManualField(attrField('icon', '自定义图标', 'text', 'SVG、Emoji 或图片 URL；填写后覆盖常用图标')),
   ],
   'xhhao-com-copy': [
     attrField('prompt', '提示符', 'text', '$'),

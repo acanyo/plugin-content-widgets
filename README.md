@@ -83,7 +83,7 @@
 
 ### xhhao-com-link-card
 
-静态外链卡片，提供 GitHub、Bilibili、Behance、小红书、新片场、Dribbble、ArtStation、Pinterest 等常用预设，并允许覆盖文案、配色、图标和预览图。
+外链卡片，提供 GitHub、Bilibili、Behance、小红书、新片场、Dribbble、ArtStation、Pinterest 等常用预设，并允许覆盖文案、配色、图标和预览图。编辑器中可以点击“读取网站信息”，由 Halo 服务端读取目标网页的标题、说明、网站图标和预览图；目标网站限制读取时会回退到平台预设，仍可手工修改。
 
 ```html
 <xhhao-com-link-card
@@ -271,4 +271,4 @@ sh gradlew build
 
 [GPL-3.0](./LICENSE) © Handsome
 
-增强提示框的类型与折叠语义参考了 MIT 许可的 [x1renn/hexo-admonition-new](https://github.com/x1renn/hexo-admonition-new)，本项目未引入其 Hexo 转译流程。
+增强提示框的类型与折叠语义参考了 MIT 许可的 [x1renn/hexo-admonition-new](https://github.com/x1renn/hexo-admonition-new)，本项目未引入其 Hexo 转译流程。网页元信息读取仅用于编辑器辅助填充，不参与前台渲染时的网络请求。

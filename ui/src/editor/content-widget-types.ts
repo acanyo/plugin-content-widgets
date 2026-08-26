@@ -44,6 +44,13 @@ export interface ContentWidgetEditorFieldOption {
   icon?: string
 }
 
+export interface ContentWidgetEditorMetadataConfig {
+  autoField?: string
+  buttonLabel?: string
+}
+
+export type ContentWidgetEditorMetadataRole = 'url' | 'manual'
+
 export interface ContentWidgetEditorListItemField {
   name: string
   label: string
@@ -73,6 +80,8 @@ export interface ContentWidgetEditorField {
   options?: ContentWidgetEditorFieldOption[]
   accepts?: string[]
   layout?: 'full' | 'half'
+  metadata?: ContentWidgetEditorMetadataConfig
+  metadataRole?: ContentWidgetEditorMetadataRole
   childTagName?: string
   wrapperTagName?: string
   addLabel?: string
