@@ -83,6 +83,19 @@
     color: var(--xhhao-com-admonition-text) !important;
     line-height: 1.72;
 
+    :where(h1, h2, h3, h4, h5, h6, p, ul, ol, li, blockquote, strong, em, del) {
+      color: inherit !important;
+    }
+
+    :where(h1, h2, h3, h4, h5, h6, p, ul, ol, blockquote) {
+      background: transparent !important;
+    }
+
+    :where(h1, h2, h3, h4, h5, h6) {
+      border: 0 !important;
+      text-shadow: none !important;
+    }
+
     a {
       color: var(--xhhao-com-admonition-accent) !important;
     }

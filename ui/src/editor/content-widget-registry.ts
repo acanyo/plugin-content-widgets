@@ -286,6 +286,7 @@ export const contentWidgetDefinitions: ContentWidgetDefinition[] = [
       href: 'https://example.com',
       target: '_blank',
       shape: 'pill',
+      preset: 'blue-gradient',
       'gradient-start': '#0ea5ff',
       'gradient-end': '#1d3fd8',
       'text-color': '#ffffff',

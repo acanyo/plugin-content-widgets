@@ -1,121 +1,257 @@
 .xhhao-com-link-card {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto auto;
-  align-items: center;
-  gap: 0.9em;
-  width: 100%;
-  min-width: 0;
-  margin: 1em 0;
-  padding: 1em;
-  overflow: hidden;
-  border: 1px solid color-mix(in srgb, var(--xhhao-com-link-card-accent) 34%, transparent);
-  border-inline-start: 0.34em solid var(--xhhao-com-link-card-accent);
-  border-radius: 0.85em;
-  background: var(--xhhao-com-link-card-bg);
-  color: var(--xhhao-com-link-card-text);
-  text-decoration: none;
-  box-shadow: 0 0.45em 1.25em color-mix(in srgb, var(--xhhao-com-link-card-accent) 12%, transparent);
-  transition: transform 0.18s ease, box-shadow 0.18s ease;
+  position: relative;
+  isolation: isolate;
+  box-sizing: border-box !important;
+  display: grid !important;
+  grid-template-columns: auto minmax(0, 1fr) auto auto !important;
+  align-items: center !important;
+  gap: 1rem !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  min-height: 7.25rem !important;
+  margin: 1rem 0 !important;
+  padding: 1rem 1.1rem !important;
+  overflow: hidden !important;
+  border: 1px solid color-mix(in srgb, var(--xhhao-com-link-card-accent) 38%, transparent) !important;
+  border-inline-start: 0.3rem solid var(--xhhao-com-link-card-accent) !important;
+  border-radius: 1rem !important;
+  background: var(--xhhao-com-link-card-bg) !important;
+  color: var(--xhhao-com-link-card-text) !important;
+  box-shadow: 0 10px 28px rgb(15 23 42 / 10%) !important;
+  font-family: inherit !important;
+  font-size: 1rem !important;
+  font-style: normal !important;
+  font-weight: 400 !important;
+  letter-spacing: normal !important;
+  line-height: normal !important;
+  text-align: start !important;
+  text-decoration: none !important;
+  text-indent: 0 !important;
+  text-shadow: none !important;
+  transition:
+    transform 160ms ease,
+    border-color 160ms ease,
+    box-shadow 160ms ease !important;
+
+  &::before {
+    position: absolute !important;
+    inset: 0 !important;
+    z-index: -1 !important;
+    display: block !important;
+    border: 0 !important;
+    background: radial-gradient(
+      circle at 0 0,
+      color-mix(in srgb, var(--xhhao-com-link-card-accent) 20%, transparent),
+      transparent 48%
+    ) !important;
+    content: "" !important;
+    pointer-events: none !important;
+  }
+
+  &::after {
+    display: none !important;
+    content: none !important;
+  }
 
   &:hover {
-    color: var(--xhhao-com-link-card-text);
+    border-color: color-mix(in srgb, var(--xhhao-com-link-card-accent) 68%, transparent) !important;
+    background: var(--xhhao-com-link-card-bg) !important;
+    color: var(--xhhao-com-link-card-text) !important;
+    box-shadow: 0 16px 38px rgb(15 23 42 / 16%) !important;
+    text-decoration: none !important;
     transform: translateY(-2px);
-    box-shadow: 0 0.7em 1.6em color-mix(in srgb, var(--xhhao-com-link-card-accent) 20%, transparent);
+  }
+
+  &:focus-visible {
+    outline: 3px solid color-mix(in srgb, var(--xhhao-com-link-card-accent) 38%, transparent) !important;
+    outline-offset: 3px !important;
   }
 
   .xhhao-com-link-card-icon,
   .xhhao-com-link-card-arrow {
-    display: grid;
-    place-items: center;
-    flex: 0 0 auto;
-    color: var(--xhhao-com-link-card-accent);
+    box-sizing: border-box !important;
+    display: inline-flex !important;
+    flex: 0 0 auto !important;
+    align-items: center !important;
+    justify-content: center !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    color: var(--xhhao-com-link-card-accent) !important;
+    text-decoration: none !important;
   }
 
   .xhhao-com-link-card-icon {
-    width: 2.85em;
-    height: 2.85em;
-    border: 1px solid color-mix(in srgb, var(--xhhao-com-link-card-accent) 36%, transparent);
-    border-radius: 0.72em;
-    background: color-mix(in srgb, var(--xhhao-com-link-card-accent) 12%, transparent);
+    width: 3.25rem !important;
+    height: 3.25rem !important;
+    border: 1px solid color-mix(in srgb, var(--xhhao-com-link-card-accent) 32%, transparent) !important;
+    border-radius: 0.85rem !important;
+    background: color-mix(in srgb, var(--xhhao-com-link-card-accent) 14%, transparent) !important;
+    font-size: 1.3rem !important;
+    line-height: 1 !important;
 
     svg,
     img {
-      width: 1.45em;
-      height: 1.45em;
-      object-fit: contain;
+      display: block !important;
+      width: 1.45rem !important;
+      height: 1.45rem !important;
+      max-width: none !important;
+      max-height: none !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      border: 0 !important;
+      border-radius: 0 !important;
+      background: transparent !important;
+      object-fit: contain !important;
     }
   }
 
   .xhhao-com-link-card-copy {
-    display: grid;
-    gap: 0.2em;
-    min-width: 0;
+    box-sizing: border-box !important;
+    display: grid !important;
+    gap: 0.22rem !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    color: inherit !important;
+    font: inherit !important;
+    text-decoration: none !important;
   }
 
   .xhhao-com-link-card-label {
-    overflow: hidden;
-    color: var(--xhhao-com-link-card-accent);
-    font-size: 0.7em;
-    font-weight: 800;
-    letter-spacing: 0.12em;
-    line-height: 1.3;
-    text-overflow: ellipsis;
-    text-transform: uppercase;
-    white-space: nowrap;
+    display: block !important;
+    overflow: hidden !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    background: transparent !important;
+    color: var(--xhhao-com-link-card-accent) !important;
+    font-family: inherit !important;
+    font-size: 0.68rem !important;
+    font-style: normal !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.13em !important;
+    line-height: 1.2 !important;
+    text-decoration: none !important;
+    text-overflow: ellipsis !important;
+    text-transform: uppercase !important;
+    white-space: nowrap !important;
   }
 
   .xhhao-com-link-card-title {
-    overflow: hidden;
-    color: inherit;
-    font-size: 1em;
-    line-height: 1.45;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    display: block !important;
+    overflow: hidden !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    background: transparent !important;
+    color: inherit !important;
+    font-family: inherit !important;
+    font-size: 1.05rem !important;
+    font-style: normal !important;
+    font-weight: 750 !important;
+    letter-spacing: normal !important;
+    line-height: 1.35 !important;
+    text-decoration: none !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
   }
 
   .xhhao-com-link-card-description {
-    display: -webkit-box;
-    overflow: hidden;
-    opacity: 0.68;
-    font-size: 0.84em;
-    line-height: 1.5;
+    display: -webkit-box !important;
+    overflow: hidden !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    background: transparent !important;
+    color: inherit !important;
+    font-family: inherit !important;
+    font-size: 0.86rem !important;
+    font-style: normal !important;
+    font-weight: 400 !important;
+    letter-spacing: normal !important;
+    line-height: 1.55 !important;
+    opacity: 0.72 !important;
+    text-decoration: none !important;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 2;
   }
 
   .xhhao-com-link-card-media {
-    width: 7em;
-    height: 4.2em;
-    overflow: hidden;
-    border-radius: 0.65em;
+    box-sizing: border-box !important;
+    display: block !important;
+    width: 7.5rem !important;
+    height: 4.6rem !important;
+    max-width: 7.5rem !important;
+    overflow: hidden !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 0.75rem !important;
+    background: color-mix(in srgb, var(--xhhao-com-link-card-accent) 10%, transparent) !important;
 
     img {
-      display: block;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
+      display: block !important;
+      width: 100% !important;
+      height: 100% !important;
+      max-width: none !important;
+      max-height: none !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      border: 0 !important;
+      border-radius: 0 !important;
+      background: transparent !important;
+      object-fit: cover !important;
     }
   }
 
   .xhhao-com-link-card-arrow {
-    width: 2.2em;
-    height: 2.2em;
-    border-radius: 999px;
-    background: color-mix(in srgb, var(--xhhao-com-link-card-accent) 12%, transparent);
+    width: 2.25rem !important;
+    height: 2.25rem !important;
+    border: 0 !important;
+    border-radius: 999px !important;
+    background: color-mix(in srgb, var(--xhhao-com-link-card-accent) 14%, transparent) !important;
+    transition:
+      transform 160ms ease,
+      background-color 160ms ease !important;
 
     svg {
-      width: 1.1em;
-      height: 1.1em;
+      display: block !important;
+      width: 1.1rem !important;
+      height: 1.1rem !important;
+      max-width: none !important;
+      max-height: none !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      border: 0 !important;
+      background: transparent !important;
     }
+  }
+
+  &:hover .xhhao-com-link-card-arrow {
+    background: color-mix(in srgb, var(--xhhao-com-link-card-accent) 22%, transparent) !important;
+    transform: translateX(2px);
   }
 }
 
 @media (max-width: 560px) {
   .xhhao-com-link-card {
-    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-columns: auto minmax(0, 1fr) auto !important;
+    gap: 0.75rem !important;
+    min-height: 6.5rem !important;
+    padding: 0.85rem !important;
+
+    .xhhao-com-link-card-icon {
+      width: 2.75rem !important;
+      height: 2.75rem !important;
+    }
+
+    .xhhao-com-link-card-description {
+      -webkit-line-clamp: 1;
+    }
 
     .xhhao-com-link-card-media {
-      display: none;
+      display: none !important;
     }
   }
 }

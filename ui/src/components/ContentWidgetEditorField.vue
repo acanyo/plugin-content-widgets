@@ -13,6 +13,8 @@ import type {
   ContentWidgetNodeAttrs,
 } from '@/editor/content-widget-types'
 import { applyLinkMetadata, readLinkMetadata } from '@/editor/link-metadata'
+import { applyLinkCardPreset } from '@/editor/link-card-presets'
+import { applyActionButtonPreset } from '@/editor/action-button-presets'
 import { type AttachmentLike } from '@halo-dev/ui-shared'
 
 const props = defineProps<{
@@ -39,7 +41,27 @@ function emitFieldValue(value: ContentWidgetEditorFieldValue) {
     metadataMessage.value = ''
   }
 
-  const nextWidget = setContentWidgetFieldValue(props.widget, props.field, value)
+  let nextWidget = setContentWidgetFieldValue(props.widget, props.field, value)
+  if (
+    props.widget.tagName === 'xhhao-com-link-card'
+    && props.field.name === 'preset'
+    && typeof value === 'string'
+  ) {
+    nextWidget = {
+      ...nextWidget,
+      attributes: applyLinkCardPreset(nextWidget.attributes || {}, value),
+    }
+  }
+  if (
+    props.widget.tagName === 'xhhao-com-action-button'
+    && props.field.name === 'preset'
+    && typeof value === 'string'
+  ) {
+    nextWidget = {
+      ...nextWidget,
+      attributes: applyActionButtonPreset(nextWidget.attributes || {}, value),
+    }
+  }
   if (props.field.metadataRole === 'manual') {
     delete nextWidget.attributes['auto-metadata']
   }

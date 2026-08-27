@@ -5,6 +5,8 @@ import { mountCustomElements } from '@xhhao/content-widgets'
 import { contentWidgetEditorFields } from '../content-widget-editor-fields'
 import { contentWidgetDefinitions } from '../content-widget-registry'
 import { applyLinkMetadata } from '../link-metadata'
+import { applyLinkCardPreset } from '../link-card-presets'
+import { applyActionButtonPreset } from '../action-button-presets'
 
 describe('independent content widget additions', () => {
   it('leaves the original button definition unchanged', () => {
@@ -49,11 +51,37 @@ describe('independent content widget additions', () => {
       .find((field) => field.name === 'icon-name')
       ?.options?.find((option) => option.value === 'none')
     expect(noIcon?.label).toBe('不显示')
+    const colorPresets = contentWidgetEditorFields['xhhao-com-action-button']
+      .find((field) => field.name === 'preset')
+      ?.options || []
+    expect(colorPresets.some((option) => option.value === 'sunset-gradient')).toBe(true)
+    expect(colorPresets.some((option) => option.value === 'green-solid')).toBe(true)
     expect(
       contentWidgetEditorFields['xhhao-com-link-card'].filter(
         (field) => field.layout === 'half',
       ).length,
     ).toBeGreaterThan(1)
+  })
+
+  it('applies an action button preset as one coherent color state', () => {
+    const attributes = applyActionButtonPreset(
+      {
+        preset: 'blue-gradient',
+        'gradient-start': '#0ea5ff',
+        'gradient-end': '#1d3fd8',
+        'text-color': '#ffffff',
+        href: '#',
+      },
+      'sunset-gradient',
+    )
+
+    expect(attributes).toMatchObject({
+      preset: 'sunset-gradient',
+      'gradient-start': '#fb923c',
+      'gradient-end': '#ef4444',
+      'text-color': '#ffffff',
+      href: '#',
+    })
   })
 
   it('renders the new elements without changing the original button component', () => {
@@ -75,7 +103,7 @@ describe('independent content widget additions', () => {
     expect(document.querySelector('.xhhao-com-link-card-icon svg')).not.toBeNull()
   })
 
-  it('maps metadata without overwriting blank results or custom fields', () => {
+  it('resets stale automatic colors when metadata changes platform', () => {
     const attributes = applyLinkMetadata(
       {
         href: 'https://example.com',
@@ -100,12 +128,65 @@ describe('independent content widget additions', () => {
       preset: 'github',
       title: 'Repository title',
       description: 'Repository description',
-      'accent-color': '#123456',
       'icon-name': 'code',
       icon: 'https://github.com/favicon.ico',
       'auto-metadata': 'true',
     })
+    expect(attributes['accent-color']).toBeUndefined()
     expect(attributes.image).toBeUndefined()
     expect(attributes['show-image']).toBeUndefined()
+  })
+
+  it('keeps deliberate colors when metadata is fetched in manual mode', () => {
+    const attributes = applyLinkMetadata(
+      {
+        href: 'https://example.com',
+        'accent-color': '#123456',
+      },
+      {
+        url: 'https://github.com/acanyo/plugin-content-widgets',
+        host: 'github.com',
+        platform: 'github',
+        siteName: 'GitHub',
+        title: 'Repository title',
+        description: 'Repository description',
+        iconUrl: '',
+        imageUrl: '',
+        source: 'page',
+      },
+      'https://example.com',
+    )
+
+    expect(attributes['accent-color']).toBe('#123456')
+  })
+
+  it('applies a preset as one coherent visual state', () => {
+    const attributes = applyLinkCardPreset(
+      {
+        preset: 'xiaohongshu',
+        href: 'https://www.xiaohongshu.com/explore/1',
+        title: '旧标题',
+        'accent-color': '#ff2442',
+        'background-color': '#fff1f2',
+        'text-color': '#ffffff',
+        icon: 'https://example.com/old-icon.png',
+        image: 'https://example.com/old-image.png',
+        'show-image': 'true',
+        'auto-metadata': 'true',
+      },
+      'community',
+    )
+
+    expect(attributes).toMatchObject({
+      preset: 'community',
+      href: '#',
+    })
+    expect(attributes.title).toBeUndefined()
+    expect(attributes['accent-color']).toBeUndefined()
+    expect(attributes['background-color']).toBeUndefined()
+    expect(attributes['text-color']).toBeUndefined()
+    expect(attributes.icon).toBeUndefined()
+    expect(attributes.image).toBeUndefined()
+    expect(attributes['auto-metadata']).toBeUndefined()
   })
 })

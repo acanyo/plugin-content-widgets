@@ -2,7 +2,11 @@ import type {
   ContentWidgetEditorField,
   ContentWidgetEditorListItemField,
 } from './content-widget-types'
-import { contentWidgetIconDefinitions } from '@xhhao/content-widgets'
+import {
+  actionButtonPresetDefinitions,
+  contentWidgetIconDefinitions,
+  linkCardPresetDefinitions,
+} from '@xhhao/content-widgets'
 
 const contentField = (label = '内容', placeholder = '输入组件内容'): ContentWidgetEditorField => ({
   name: 'innerHTML',
@@ -142,6 +146,11 @@ const buttonShapeOptions = [
   { label: '胶囊', value: 'pill' },
 ]
 
+const actionButtonPresetOptions = actionButtonPresetDefinitions.map((preset) => ({
+  label: preset.label,
+  value: preset.value,
+}))
+
 const targetOptions = [
   { label: '当前窗口', value: '_self' },
   { label: '新窗口', value: '_blank' },
@@ -171,23 +180,10 @@ const admonitionTypeOptions = [
   { label: 'Bug', value: 'bug' },
 ]
 
-const linkCardPresetOptions = [
-  { label: 'GitHub', value: 'github' },
-  { label: 'Bilibili', value: 'bilibili' },
-  { label: 'Behance', value: 'behance' },
-  { label: '小红书', value: 'xiaohongshu' },
-  { label: '新片场', value: 'xinpianchang' },
-  { label: 'Dribbble', value: 'dribbble' },
-  { label: 'ArtStation', value: 'artstation' },
-  { label: 'Pinterest', value: 'pinterest' },
-  { label: '官方网站', value: 'website' },
-  { label: '文档', value: 'docs' },
-  { label: '下载', value: 'download' },
-  { label: '在线工具', value: 'tools' },
-  { label: '游戏', value: 'game' },
-  { label: '社区', value: 'community' },
-  { label: '问题反馈', value: 'feedback' },
-]
+const linkCardPresetOptions = linkCardPresetDefinitions.map((preset) => ({
+  label: preset.label,
+  value: preset.value,
+}))
 
 export const contentWidgetEditorFields: Record<string, ContentWidgetEditorField[]> = {
   'xhhao-com-alert': [
@@ -440,6 +436,7 @@ export const contentWidgetEditorFields: Record<string, ContentWidgetEditorField[
     contentField('按钮文本', '访问链接'),
   ],
   'xhhao-com-action-button': [
+    attrField('preset', '配色预设', 'select', undefined, actionButtonPresetOptions),
     halfField(attrField('shape', '圆角', 'select', undefined, buttonShapeOptions)),
     halfField(attrField('target', '打开方式', 'select', undefined, targetOptions)),
     attrField('href', '链接', 'text', 'https://example.com'),

@@ -43,7 +43,10 @@ export function applyLinkMetadata(
   fallbackHref: string,
   autoField = 'auto-metadata',
 ) {
-  const next = { ...attributes }
+  const followsAutomaticPreset = attributes[autoField] === '' || attributes[autoField] === 'true'
+  const next = followsAutomaticPreset
+    ? clearAutomaticPresetAttributes(attributes)
+    : { ...attributes }
   const platform = metadata.platform.toLowerCase()
 
   setMetadataAttribute(next, 'preset', metadataPresetMap[platform] || 'website')
@@ -68,6 +71,27 @@ export function applyLinkMetadata(
   }
 
   setMetadataAttribute(next, autoField, 'true')
+  return next
+}
+
+function clearAutomaticPresetAttributes(attributes: Record<string, string>) {
+  const next = { ...attributes }
+
+  for (const name of [
+    'label',
+    'title',
+    'description',
+    'accent-color',
+    'background-color',
+    'text-color',
+    'icon-name',
+    'icon',
+    'image',
+    'show-image',
+  ]) {
+    delete next[name]
+  }
+
   return next
 }
 
