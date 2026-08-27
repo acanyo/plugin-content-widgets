@@ -1,13 +1,18 @@
 <script lang="ts" setup>
-import { computed, ref } from 'vue'
-import {
-  contentWidgetCategories,
-  contentWidgetDefinitions,
-} from '@/editor/content-widget-registry'
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+import { contentWidgetCategories, contentWidgetDefinitions } from '@/editor/content-widget-registry'
 import { definitionToNodeAttrs } from '@/editor/content-widget-html'
+import {
+  isContentWidgetFavoritesStorageEvent,
+  loadContentWidgetFavorites,
+  saveContentWidgetFavorites,
+  toggleContentWidgetFavorite,
+} from '@/editor/content-widget-favorites'
 import type { ContentWidgetDefinition } from '@/editor/content-widget-types'
 import ContentWidgetRenderer from './ContentWidgetRenderer.vue'
 import IconClose from '~icons/ri/close-line'
+import IconHeartFill from '~icons/ri/heart-fill'
+import IconHeartLine from '~icons/ri/heart-line'
 import IconSearch from '~icons/ri/search-line'
 
 const emit = defineEmits<{
@@ -17,17 +22,28 @@ const emit = defineEmits<{
 
 const keyword = ref('')
 const activeCategory = ref('全部')
+const favoriteIds = ref(loadContentWidgetFavorites())
+const favoriteCategory = '我的收藏'
+const knownWidgetIds = new Set(contentWidgetDefinitions.map((item) => item.id))
+const favoriteIdSet = computed(
+  () => new Set(favoriteIds.value.filter((id) => knownWidgetIds.has(id))),
+)
 
-const categories = computed(() => ['全部', ...contentWidgetCategories])
+const categories = computed(() => ['全部', favoriteCategory, ...contentWidgetCategories])
 const categoryCount = (category: string) =>
   category === '全部'
     ? contentWidgetDefinitions.length
-    : contentWidgetDefinitions.filter((item) => item.category === category).length
+    : category === favoriteCategory
+      ? favoriteIdSet.value.size
+      : contentWidgetDefinitions.filter((item) => item.category === category).length
 
 const filteredWidgets = computed(() => {
   const value = keyword.value.trim().toLowerCase()
   return contentWidgetDefinitions.filter((item) => {
-    const matchesCategory = activeCategory.value === '全部' || item.category === activeCategory.value
+    const matchesCategory =
+      activeCategory.value === '全部' ||
+      (activeCategory.value === favoriteCategory && favoriteIdSet.value.has(item.id)) ||
+      item.category === activeCategory.value
     const matchesKeyword =
       !value ||
       [item.title, item.description, item.tagName, ...(item.keywords || [])]
@@ -40,11 +56,39 @@ const filteredWidgets = computed(() => {
 })
 
 const previewWidget = (widget: ContentWidgetDefinition) => definitionToNodeAttrs(widget)
+const emptyMessage = computed(() =>
+  activeCategory.value === favoriteCategory && !keyword.value.trim()
+    ? '还没有收藏组件，点击组件卡片上的爱心即可收藏'
+    : '没有找到匹配的组件',
+)
+
+function isFavorite(widgetId: string) {
+  return favoriteIdSet.value.has(widgetId)
+}
+
+function toggleFavorite(widgetId: string) {
+  favoriteIds.value = toggleContentWidgetFavorite([...favoriteIdSet.value], widgetId)
+  saveContentWidgetFavorites(favoriteIds.value)
+}
+
+function handleStorage(event: StorageEvent) {
+  if (isContentWidgetFavoritesStorageEvent(event)) {
+    favoriteIds.value = loadContentWidgetFavorites()
+  }
+}
+
+onMounted(() => window.addEventListener('storage', handleStorage))
+onBeforeUnmount(() => window.removeEventListener('storage', handleStorage))
 </script>
 
 <template>
   <div class="content-widget-picker-overlay" @click.self="emit('close')">
-    <section class="content-widget-picker-dialog" role="dialog" aria-modal="true" aria-label="文章组件">
+    <section
+      class="content-widget-picker-dialog"
+      role="dialog"
+      aria-modal="true"
+      aria-label="文章组件"
+    >
       <header class="content-widget-picker__header">
         <div class="content-widget-picker__title">
           <h2>文章组件</h2>
@@ -81,12 +125,10 @@ const previewWidget = (widget: ContentWidgetDefinition) => definitionToNodeAttrs
           </label>
 
           <div class="content-widget-picker__grid">
-            <button
+            <article
               v-for="widget in filteredWidgets"
               :key="widget.id"
               class="content-widget-picker__item"
-              type="button"
-              @click="emit('select', widget)"
             >
               <span class="content-widget-picker__preview">
                 <ContentWidgetRenderer
@@ -98,7 +140,7 @@ const previewWidget = (widget: ContentWidgetDefinition) => definitionToNodeAttrs
 
               <span class="content-widget-picker__item-copy">
                 <span class="content-widget-picker__item-head">
-                  <strong>{{ widget.title }}</strong>
+                  <strong :id="`content-widget-title-${widget.id}`">{{ widget.title }}</strong>
                   <span
                     class="content-widget-picker__kind"
                     :class="`content-widget-picker__kind--${widget.kind}`"
@@ -108,10 +150,30 @@ const previewWidget = (widget: ContentWidgetDefinition) => definitionToNodeAttrs
                 </span>
                 <span class="content-widget-picker__item-desc">{{ widget.description }}</span>
               </span>
-            </button>
+
+              <button
+                class="content-widget-picker__select"
+                type="button"
+                :aria-labelledby="`content-widget-title-${widget.id}`"
+                @click="emit('select', widget)"
+              />
+
+              <button
+                class="content-widget-picker__favorite"
+                :class="{ 'is-favorite': isFavorite(widget.id) }"
+                type="button"
+                :aria-label="`${isFavorite(widget.id) ? '取消收藏' : '收藏'}${widget.title}`"
+                :aria-pressed="isFavorite(widget.id)"
+                :title="isFavorite(widget.id) ? '取消收藏' : '收藏'"
+                @click.stop="toggleFavorite(widget.id)"
+              >
+                <IconHeartFill v-if="isFavorite(widget.id)" />
+                <IconHeartLine v-else />
+              </button>
+            </article>
 
             <div v-if="!filteredWidgets.length" class="content-widget-picker__empty">
-              没有找到匹配的组件
+              {{ emptyMessage }}
             </div>
           </div>
         </main>
@@ -302,6 +364,7 @@ const previewWidget = (widget: ContentWidgetDefinition) => definitionToNodeAttrs
 }
 
 .content-widget-picker__item {
+  position: relative;
   display: grid;
   grid-template-rows: minmax(86px, auto) auto;
   gap: 12px;
@@ -312,7 +375,6 @@ const previewWidget = (widget: ContentWidgetDefinition) => definitionToNodeAttrs
   background: #fff;
   color: #111827;
   text-align: left;
-  cursor: pointer;
 }
 
 .content-widget-picker__item:hover {
@@ -322,16 +384,64 @@ const previewWidget = (widget: ContentWidgetDefinition) => definitionToNodeAttrs
   transform: translateY(-1px);
 }
 
-.content-widget-picker__item:focus-visible {
-  border-color: #2563eb;
+.content-widget-picker__select {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  border: none;
+  border-radius: inherit;
+  background: transparent;
+  cursor: pointer;
+}
+
+.content-widget-picker__select:focus-visible {
   outline: none;
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.14);
 }
 
+.content-widget-picker__favorite {
+  z-index: 2;
+  grid-row: 2;
+  grid-column: 1;
+  align-self: start;
+  justify-self: end;
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  margin-top: -3px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  background: transparent;
+  color: #94a3b8;
+  cursor: pointer;
+}
+
+.content-widget-picker__favorite:hover,
+.content-widget-picker__favorite:focus-visible {
+  border-color: #fecdd3;
+  outline: none;
+  background: #fff1f2;
+  color: #e11d48;
+}
+
+.content-widget-picker__favorite.is-favorite {
+  color: #e11d48;
+}
+
+.content-widget-picker__favorite svg {
+  width: 16px;
+  height: 16px;
+}
+
 .content-widget-picker__item-copy {
+  grid-row: 2;
+  grid-column: 1;
   display: grid;
   gap: 5px;
   min-width: 0;
+  padding-right: 34px;
 }
 
 .content-widget-picker__item-head {

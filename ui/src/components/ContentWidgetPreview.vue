@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { NodeViewWrapper, nodeViewProps } from '@halo-dev/richtext-editor'
-import { computed } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { getContentWidgetEditorFields } from '@/editor/content-widget-editor-fields'
 import { getContentWidgetDefinitionByTagName } from '@/editor/content-widget-registry'
 import type { ContentWidgetNodeAttrs } from '@/editor/content-widget-types'
@@ -19,6 +19,55 @@ const fields = computed(() => getContentWidgetEditorFields(widget.value.tagName)
 const hasEditableFields = computed(() => fields.value.length > 0)
 const definition = computed(() => getContentWidgetDefinitionByTagName(widget.value.tagName))
 const title = computed(() => definition.value?.title || widget.value.title || '文章组件')
+const interactionRoot = ref<HTMLElement | null>(null)
+const editorOpen = ref(false)
+
+watch(
+  () => props.selected,
+  (selected) => {
+    if (selected) {
+      editorOpen.value = true
+    }
+  },
+  { immediate: true },
+)
+
+function closeEditor() {
+  editorOpen.value = false
+}
+
+function openEditor() {
+  editorOpen.value = true
+}
+
+function handleDocumentPointerDown(event: PointerEvent) {
+  if (!editorOpen.value || !interactionRoot.value) {
+    return
+  }
+
+  const target = event.target
+  if (target instanceof globalThis.Node && interactionRoot.value.contains(target)) {
+    return
+  }
+
+  closeEditor()
+}
+
+function handleEditorKeydown(event: KeyboardEvent) {
+  event.stopPropagation()
+  if (event.key === 'Escape') {
+    event.preventDefault()
+    closeEditor()
+  }
+}
+
+onMounted(() => {
+  document.addEventListener('pointerdown', handleDocumentPointerDown, true)
+})
+
+onBeforeUnmount(() => {
+  document.removeEventListener('pointerdown', handleDocumentPointerDown, true)
+})
 
 function updateWidget(nextWidget: ContentWidgetNodeAttrs) {
   const position = props.getPos()
@@ -56,46 +105,54 @@ function updateWidget(nextWidget: ContentWidgetNodeAttrs) {
     class="content-widget-node"
     :class="{
       'content-widget-node--inline': isInline,
-      'content-widget-node--selected': selected,
+      'content-widget-node--selected': selected || editorOpen,
     }"
   >
-    <ContentWidgetRenderer
-      class="content-widget-node__preview"
-      :widget="widget"
-      :inline="isInline"
-    />
-
     <component
       :is="isInline ? 'span' : 'div'"
-      v-if="selected"
-      class="content-widget-node__editor"
-      :class="{ 'content-widget-node__editor--inline': isInline }"
-      contenteditable="false"
-      @mousedown.stop
-      @click.stop
-      @input.stop
-      @focusin.stop
-      @focusout.stop
-      @keydown.stop
-      @keyup.stop
+      ref="interactionRoot"
+      class="content-widget-node__interaction-root"
+      @click="openEditor"
     >
-      <span class="content-widget-node__editor-head">
-        <strong>{{ title }}</strong>
-        <em>{{ isInline ? '行内组件' : '块级组件' }}</em>
-      </span>
+      <ContentWidgetRenderer
+        class="content-widget-node__preview"
+        :widget="widget"
+        :inline="isInline"
+      />
 
-      <template v-if="hasEditableFields">
-        <ContentWidgetEditorField
-          v-for="field in fields"
-          :key="field.name"
-          :widget="widget"
-          :field="field"
-          :inline="isInline"
-          :class="{ 'content-widget-node__field--half': field.layout === 'half' }"
-          @update="updateWidget"
-        />
-      </template>
-      <span v-else class="content-widget-node__editor-empty">这个组件无需配置。</span>
+      <component
+        :is="isInline ? 'span' : 'div'"
+        v-if="editorOpen"
+        class="content-widget-node__editor"
+        :class="{ 'content-widget-node__editor--inline': isInline }"
+        contenteditable="false"
+        @pointerdown.stop
+        @mousedown.stop
+        @click.stop
+        @input.stop
+        @focusin.stop
+        @focusout.stop
+        @keydown="handleEditorKeydown"
+        @keyup.stop
+      >
+        <span class="content-widget-node__editor-head">
+          <strong>{{ title }}</strong>
+          <em>{{ isInline ? '行内组件' : '块级组件' }}</em>
+        </span>
+
+        <template v-if="hasEditableFields">
+          <ContentWidgetEditorField
+            v-for="field in fields"
+            :key="field.name"
+            :widget="widget"
+            :field="field"
+            :inline="isInline"
+            :class="{ 'content-widget-node__field--half': field.layout === 'half' }"
+            @update="updateWidget"
+          />
+        </template>
+        <span v-else class="content-widget-node__editor-empty">这个组件无需配置。</span>
+      </component>
     </component>
   </NodeViewWrapper>
 </template>
@@ -161,6 +218,10 @@ function updateWidget(nextWidget: ContentWidgetNodeAttrs) {
   min-width: 0;
   padding-bottom: 8px;
   border-bottom: 1px solid #eef2f7;
+}
+
+.content-widget-node__interaction-root {
+  display: contents;
 }
 
 .content-widget-node__editor-head,
