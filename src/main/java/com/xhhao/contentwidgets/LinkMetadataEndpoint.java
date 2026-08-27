@@ -132,11 +132,11 @@ public class LinkMetadataEndpoint implements CustomEndpoint {
             oembed.description(),
             jsonLdValue(document, "description", "abstract")
         );
-        var iconUrl = firstHttpUrl(
+        var iconUrl = firstPublicHttpUrl(
             specialized.iconUrl(),
             findIcon(document, fetched.uri())
         );
-        var imageUrl = firstHttpUrl(
+        var imageUrl = firstPublicHttpUrl(
             specialized.imageUrl(),
             absolute(document, "meta[property=og:image]", "content"),
             absolute(document, "meta[name=twitter:image]", "content"),
@@ -420,11 +420,18 @@ public class LinkMetadataEndpoint implements CustomEndpoint {
         if (address instanceof Inet4Address) {
             var first = Byte.toUnsignedInt(bytes[0]);
             var second = Byte.toUnsignedInt(bytes[1]);
+            var third = Byte.toUnsignedInt(bytes[2]);
             return first != 0
                 && first != 127
                 && !(first == 100 && second >= 64 && second <= 127)
                 && !(first == 169 && second == 254)
-                && !(first == 198 && (second == 18 || second == 19));
+                && !(first == 192 && second == 0 && third == 0)
+                && !(first == 192 && second == 0 && third == 2)
+                && !(first == 192 && second == 88 && third == 99)
+                && !(first == 198 && (second == 18 || second == 19))
+                && !(first == 198 && second == 51 && third == 100)
+                && !(first == 203 && second == 0 && third == 113)
+                && first < 224;
         }
         if (address instanceof Inet6Address) {
             var mappedPrefix = true;
@@ -445,7 +452,11 @@ public class LinkMetadataEndpoint implements CustomEndpoint {
                 }
             }
             var first = Byte.toUnsignedInt(bytes[0]);
-            return (first & 0xfe) != 0xfc;
+            var documentationPrefix = first == 0x20
+                && Byte.toUnsignedInt(bytes[1]) == 0x01
+                && Byte.toUnsignedInt(bytes[2]) == 0x0d
+                && Byte.toUnsignedInt(bytes[3]) == 0xb8;
+            return (first & 0xfe) != 0xfc && !documentationPrefix;
         }
         return false;
     }
@@ -519,6 +530,23 @@ public class LinkMetadataEndpoint implements CustomEndpoint {
                 }
             } catch (IllegalArgumentException ignored) {
                 // Try the next metadata candidate.
+            }
+        }
+        return "";
+    }
+
+    static String firstPublicHttpUrl(String... values) {
+        for (var value : values) {
+            var candidate = firstHttpUrl(value);
+            if (candidate.isBlank()) continue;
+            try {
+                var uri = URI.create(candidate);
+                var port = uri.getPort();
+                if (port != -1 && port != 80 && port != 443) continue;
+                validatePublicHost(uri);
+                return candidate;
+            } catch (IllegalArgumentException ignored) {
+                // Metadata can contain private, malformed, or unreachable asset URLs.
             }
         }
         return "";

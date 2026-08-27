@@ -1,9 +1,8 @@
 <script lang="ts" setup>
-import { ref } from 'vue'
+import { onBeforeUnmount, ref, watch } from 'vue'
 import {
   createDefaultListItem,
   getContentWidgetFieldValue,
-  setContentWidgetFieldValue,
 } from '@/editor/content-widget-field-values'
 import type {
   ContentWidgetEditorField,
@@ -12,9 +11,11 @@ import type {
   ContentWidgetEditorFieldValue,
   ContentWidgetNodeAttrs,
 } from '@/editor/content-widget-types'
-import { applyLinkMetadata, readLinkMetadata } from '@/editor/link-metadata'
-import { applyLinkCardPreset } from '@/editor/link-card-presets'
-import { applyActionButtonPreset } from '@/editor/action-button-presets'
+import {
+  applyContentWidgetFieldValue,
+  applyContentWidgetMetadata,
+} from '@/editor/content-widget-field-handlers'
+import { readLinkMetadata } from '@/editor/link-metadata'
 import { type AttachmentLike } from '@halo-dev/ui-shared'
 
 const props = defineProps<{
@@ -25,6 +26,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   update: [widget: ContentWidgetNodeAttrs]
+  'overlay-change': [visible: boolean]
 }>()
 
 const attachmentSelectorVisible = ref(false)
@@ -33,39 +35,28 @@ const activeAttachmentItemIndex = ref<number | null>(null)
 const metadataLoading = ref(false)
 const metadataMessage = ref('')
 let metadataRequestId = 0
+let metadataAbortController: AbortController | undefined
+let metadataActiveHref = ''
+
+watch(attachmentSelectorVisible, (visible) => emit('overlay-change', visible))
+
+onBeforeUnmount(() => {
+  metadataRequestId += 1
+  metadataAbortController?.abort()
+  if (attachmentSelectorVisible.value) emit('overlay-change', false)
+})
 
 function emitFieldValue(value: ContentWidgetEditorFieldValue) {
   if (props.field.metadataRole) {
     metadataRequestId += 1
+    metadataAbortController?.abort()
+    metadataAbortController = undefined
+    metadataActiveHref = ''
     metadataLoading.value = false
     metadataMessage.value = ''
   }
 
-  let nextWidget = setContentWidgetFieldValue(props.widget, props.field, value)
-  if (
-    props.widget.tagName === 'xhhao-com-link-card'
-    && props.field.name === 'preset'
-    && typeof value === 'string'
-  ) {
-    nextWidget = {
-      ...nextWidget,
-      attributes: applyLinkCardPreset(nextWidget.attributes || {}, value),
-    }
-  }
-  if (
-    props.widget.tagName === 'xhhao-com-action-button'
-    && props.field.name === 'preset'
-    && typeof value === 'string'
-  ) {
-    nextWidget = {
-      ...nextWidget,
-      attributes: applyActionButtonPreset(nextWidget.attributes || {}, value),
-    }
-  }
-  if (props.field.metadataRole === 'manual') {
-    delete nextWidget.attributes['auto-metadata']
-  }
-  emit('update', nextWidget)
+  emit('update', applyContentWidgetFieldValue(props.widget, props.field, value))
 }
 
 function primitiveValue() {
@@ -104,24 +95,24 @@ async function fetchMetadata(force = false) {
   const href = primitiveTextValue().trim()
   if (!href || href === '#') return
 
+  if (metadataLoading.value && metadataActiveHref === href) return
+
+  metadataAbortController?.abort()
+  const abortController = new AbortController()
+  metadataAbortController = abortController
+  metadataActiveHref = href
+
   const requestId = ++metadataRequestId
   metadataLoading.value = true
   metadataMessage.value = '正在读取网站信息…'
 
   try {
-    const metadata = await readLinkMetadata(href)
+    const metadata = await readLinkMetadata(href, abortController.signal)
     if (requestId !== metadataRequestId) return
-    const attributes = applyLinkMetadata(
-      props.widget.attributes,
-      metadata,
-      href,
-      props.field.metadata.autoField || 'auto-metadata',
-    )
+    if (!force && !metadataAutoEnabled()) return
+    if (primitiveTextValue().trim() !== href) return
 
-    emit('update', {
-      ...props.widget,
-      attributes,
-    })
+    emit('update', applyContentWidgetMetadata(props.widget, props.field, metadata, href))
 
     metadataMessage.value = metadata.source === 'fallback'
       ? '目标网站限制了自动读取，已填入平台默认信息；你仍可手工修改。'
@@ -130,10 +121,13 @@ async function fetchMetadata(force = false) {
         : '已读取标题、说明和网站图标。'
   } catch (error) {
     if (requestId !== metadataRequestId) return
+    if (error instanceof Error && error.name === 'AbortError') return
     metadataMessage.value = error instanceof Error ? error.message : '无法读取该网站信息。'
   } finally {
     if (requestId === metadataRequestId) {
       metadataLoading.value = false
+      metadataActiveHref = ''
+      if (metadataAbortController === abortController) metadataAbortController = undefined
     }
   }
 }
@@ -422,6 +416,7 @@ function moveItem(index: number, offset: number) {
           type="button"
           class="content-widget-editor-field__metadata-btn"
           :disabled="metadataLoading"
+          @pointerdown.prevent
           @click.stop.prevent="fetchMetadata(true)"
         >
           {{ metadataLoading ? '读取中…' : field.metadata.buttonLabel || '读取网站信息' }}

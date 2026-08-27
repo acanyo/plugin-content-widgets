@@ -7,6 +7,7 @@ import { contentWidgetDefinitions } from '../content-widget-registry'
 import { applyLinkMetadata } from '../link-metadata'
 import { applyLinkCardPreset } from '../link-card-presets'
 import { applyActionButtonPreset } from '../action-button-presets'
+import { applyContentWidgetFieldValue } from '../content-widget-field-handlers'
 
 describe('independent content widget additions', () => {
   it('leaves the original button definition unchanged', () => {
@@ -81,6 +82,24 @@ describe('independent content widget additions', () => {
       'gradient-end': '#ef4444',
       'text-color': '#ffffff',
       href: '#',
+    })
+  })
+
+  it('routes widget-specific field changes through the handler registry', () => {
+    const field = contentWidgetEditorFields['xhhao-com-action-button'].find(
+      (item) => item.name === 'preset',
+    )!
+    const widget = {
+      tagName: 'xhhao-com-action-button',
+      attributes: { preset: 'blue-gradient' },
+      innerHTML: '前往访问',
+    }
+
+    expect(applyContentWidgetFieldValue(widget, field, 'green-solid').attributes).toMatchObject({
+      preset: 'green-solid',
+      'gradient-start': '#16a34a',
+      'gradient-end': '#16a34a',
+      'text-color': '#ffffff',
     })
   })
 

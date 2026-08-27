@@ -98,10 +98,11 @@ function clearAutomaticPresetAttributes(attributes: Record<string, string>) {
 const LINK_METADATA_ENDPOINT =
   '/apis/console.api.content-widgets.xhhao.com/v1alpha1/link-metadata'
 
-export async function readLinkMetadata(url: string): Promise<LinkMetadata> {
+export async function readLinkMetadata(url: string, signal?: AbortSignal): Promise<LinkMetadata> {
   const response = await fetch(`${LINK_METADATA_ENDPOINT}?url=${encodeURIComponent(url)}`, {
     credentials: 'same-origin',
     headers: { Accept: 'application/json' },
+    signal,
   })
 
   const contentType = response.headers.get('content-type') || ''

@@ -1,6 +1,8 @@
 <script lang="ts">
   import { marked } from "marked";
   import { contentWidgetIcons } from "./icons/contentWidgetIcons";
+  import ContentWidgetIcon from "./ContentWidgetIcon.svelte";
+  import { safeColor } from "./contentWidgetRenderUtils";
 
   type AdmonitionType = "tip" | "info" | "warning" | "danger" | "success" | "question" | "example" | "quote" | "bug";
 
@@ -42,14 +44,9 @@
     content?: string;
   } = $props();
 
-  const safeColor = (value: string | undefined, fallback: string) =>
-    /^#(?:[\da-f]{3}|[\da-f]{6}|[\da-f]{8})$/i.test(value?.trim() || "") ? value!.trim() : fallback;
-
   let preset = $derived(presets[type] || presets.tip);
   let customIcon = $derived(icon?.trim() || "");
   let builtInIcon = $derived(contentWidgetIcons[iconName || preset.icon] || "");
-  let customIconIsSvg = $derived(customIcon.startsWith("<svg"));
-  let iconIsImage = $derived(Boolean(customIcon && /^(?:https?:)?\/\/|^\//i.test(customIcon)));
   let renderedContent = $derived(
     marked.parse(content.replace(/^[\u200B-\u200F\uFEFF]/, ""), {
       async: false,
@@ -69,7 +66,7 @@
     <details open={defaultOpen}>
       <summary class="xhhao-com-admonition-title">
         <span class="xhhao-com-admonition-icon" aria-hidden="true">
-          {#if customIconIsSvg}{@html customIcon}{:else if iconIsImage}<img src={customIcon} alt="" loading="lazy" referrerpolicy="no-referrer" />{:else if customIcon}{customIcon}{:else}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">{@html builtInIcon}</svg>{/if}
+          <ContentWidgetIcon {customIcon} {builtInIcon} />
         </span>
         <strong>{title || preset.title}</strong>
         <span class="xhhao-com-admonition-chevron" aria-hidden="true">⌄</span>
@@ -80,7 +77,7 @@
     {#if showTitle}
       <div class="xhhao-com-admonition-title">
         <span class="xhhao-com-admonition-icon" aria-hidden="true">
-          {#if customIconIsSvg}{@html customIcon}{:else if iconIsImage}<img src={customIcon} alt="" loading="lazy" referrerpolicy="no-referrer" />{:else if customIcon}{customIcon}{:else}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">{@html builtInIcon}</svg>{/if}
+          <ContentWidgetIcon {customIcon} {builtInIcon} />
         </span>
         <strong>{title || preset.title}</strong>
       </div>

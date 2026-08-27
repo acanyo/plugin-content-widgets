@@ -1,6 +1,8 @@
 <script lang="ts">
   import { contentWidgetIcons } from "./icons/contentWidgetIcons";
   import { getActionButtonPreset, type ActionButtonPreset } from "./actionButtonPresets";
+  import ContentWidgetIcon from "./ContentWidgetIcon.svelte";
+  import { safeColor, safeHref } from "./contentWidgetRenderUtils";
 
   type ButtonShape = "square" | "rounded" | "pill";
   type IconPosition = "before" | "after" | "none";
@@ -31,17 +33,10 @@
     content?: string;
   } = $props();
 
-  const safeColor = (value: string | undefined, fallback: string) =>
-    /^#(?:[\da-f]{3}|[\da-f]{6}|[\da-f]{8})$/i.test(value?.trim() || "") ? value!.trim() : fallback;
-  const safeHref = (value: string) =>
-    /^(?:https?:|mailto:|tel:|#|\/)/i.test(value.trim()) ? value.trim() : "#";
-
   let rel = $derived(target === "_blank" ? "noopener noreferrer" : undefined);
   let colorPreset = $derived(getActionButtonPreset(preset));
   let customIcon = $derived(icon?.trim() || "");
   let builtInIcon = $derived(contentWidgetIcons[iconName] || "");
-  let customIconIsSvg = $derived(customIcon.startsWith("<svg"));
-  let iconIsImage = $derived(Boolean(customIcon && /^(?:https?:)?\/\/|^\//i.test(customIcon)));
   let showIcon = $derived(iconPosition !== "none" && Boolean(customIcon || builtInIcon));
 </script>
 
@@ -56,13 +51,13 @@
 >
   {#if showIcon && iconPosition === "before"}
     <span class="xhhao-com-action-button-icon" aria-hidden="true">
-      {#if customIconIsSvg}{@html customIcon}{:else if iconIsImage}<img src={customIcon} alt="" loading="lazy" referrerpolicy="no-referrer" />{:else if customIcon}{customIcon}{:else}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">{@html builtInIcon}</svg>{/if}
+      <ContentWidgetIcon {customIcon} {builtInIcon} />
     </span>
   {/if}
   <span class="xhhao-com-action-button-content">{@html content}</span>
   {#if showIcon && iconPosition === "after"}
     <span class="xhhao-com-action-button-icon" aria-hidden="true">
-      {#if customIconIsSvg}{@html customIcon}{:else if iconIsImage}<img src={customIcon} alt="" loading="lazy" referrerpolicy="no-referrer" />{:else if customIcon}{customIcon}{:else}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">{@html builtInIcon}</svg>{/if}
+      <ContentWidgetIcon {customIcon} {builtInIcon} />
     </span>
   {/if}
 </a>

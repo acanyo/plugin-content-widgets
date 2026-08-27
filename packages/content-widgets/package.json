@@ -19,17 +19,19 @@
   "type": "module",
   "exports": {
     ".": {
+      "types": "./dist/index.d.ts",
       "import": "./dist/content-widgets.js"
     },
     "./content-widgets.css": "./dist/content-widgets.css"
   },
   "main": "./dist/content-widgets.js",
   "module": "./dist/content-widgets.js",
+  "types": "./dist/index.d.ts",
   "files": [
     "dist"
   ],
   "scripts": {
-    "build": "vite build --config vite.config.lib.ts",
+    "build": "vite build --config vite.config.lib.ts && tsc -p tsconfig.build.json",
     "check": "svelte-check --tsconfig ./tsconfig.app.json && tsc -p tsconfig.node.json",
     "dev": "vite",
     "preview": "vite preview",

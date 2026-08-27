@@ -53,4 +53,32 @@ public class LinkMetadataEndpointTest {
         );
         assertFalse(LinkMetadataEndpoint.isPublicAddress(mappedPrivateAddress));
     }
+
+    @Test
+    void rejectsReservedAndDocumentationAddresses() throws Exception {
+        for (var value : new String[] {
+            "192.0.2.1",
+            "198.51.100.10",
+            "203.0.113.20",
+            "240.0.0.1",
+            "2001:db8::1"
+        }) {
+            assertFalse(
+                LinkMetadataEndpoint.isPublicAddress(InetAddress.getByName(value)),
+                value
+            );
+        }
+    }
+
+    @Test
+    void rejectsPrivateMetadataAssets() {
+        assertEquals(
+            "",
+            LinkMetadataEndpoint.firstPublicHttpUrl("http://127.0.0.1/private.png")
+        );
+        assertEquals(
+            "https://8.8.8.8/favicon.ico",
+            LinkMetadataEndpoint.firstPublicHttpUrl("https://8.8.8.8/favicon.ico")
+        );
+    }
 }

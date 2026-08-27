@@ -271,4 +271,4 @@ sh gradlew build
 
 [GPL-3.0](./LICENSE) © Handsome
 
-增强提示框的类型与折叠语义参考了 MIT 许可的 [x1renn/hexo-admonition-new](https://github.com/x1renn/hexo-admonition-new)，本项目未引入其 Hexo 转译流程。网页元信息读取仅用于编辑器辅助填充，不参与前台渲染时的网络请求。
+增强提示框的类型与折叠语义参考了 MIT 许可的 [x1renn/hexo-admonition-new](https://github.com/x1renn/hexo-admonition-new)，本项目未引入其 Hexo 转译流程。完整版权与许可说明见 [THIRD_PARTY_NOTICES.md](./THIRD_PARTY_NOTICES.md)。网页元信息读取仅用于编辑器辅助填充，不参与前台渲染时的网络请求。

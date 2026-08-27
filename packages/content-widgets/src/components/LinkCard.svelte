@@ -1,6 +1,8 @@
 <script lang="ts">
   import { contentWidgetIcons } from "./icons/contentWidgetIcons";
   import { getLinkCardPreset, type LinkCardPreset } from "./linkCardPresets";
+  import ContentWidgetIcon from "./ContentWidgetIcon.svelte";
+  import { safeColor, safeHref, safeImage } from "./contentWidgetRenderUtils";
 
   let {
     preset = "github",
@@ -32,18 +34,9 @@
     showImage?: boolean;
   } = $props();
 
-  const safeColor = (value: string | undefined, fallback: string) =>
-    /^#(?:[\da-f]{3}|[\da-f]{6}|[\da-f]{8})$/i.test(value?.trim() || "") ? value!.trim() : fallback;
-  const safeHref = (value: string) =>
-    /^(?:https?:|mailto:|tel:|#|\/)/i.test(value.trim()) ? value.trim() : "#";
-  const safeImage = (value: string | undefined) =>
-    /^(?:https?:)?\/\/|^\//i.test(value?.trim() || "") ? value!.trim() : "";
-
   let config = $derived(getLinkCardPreset(preset));
   let customIcon = $derived(icon?.trim() || "");
   let builtInIcon = $derived(contentWidgetIcons[iconName || config.icon] || "");
-  let customIconIsSvg = $derived(customIcon.startsWith("<svg"));
-  let iconIsImage = $derived(Boolean(customIcon && /^(?:https?:)?\/\/|^\//i.test(customIcon)));
   let imageUrl = $derived(safeImage(image));
   let rel = $derived(target === "_blank" ? "noopener noreferrer" : undefined);
 </script>
@@ -58,7 +51,7 @@
   {rel}
 >
   <span class="xhhao-com-link-card-icon" aria-hidden="true">
-    {#if customIconIsSvg}{@html customIcon}{:else if iconIsImage}<img src={customIcon} alt="" loading="lazy" referrerpolicy="no-referrer" />{:else if customIcon}{customIcon}{:else}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">{@html builtInIcon}</svg>{/if}
+    <ContentWidgetIcon {customIcon} {builtInIcon} />
   </span>
   <span class="xhhao-com-link-card-copy">
     <span class="xhhao-com-link-card-label">{label || config.eyebrow}</span>

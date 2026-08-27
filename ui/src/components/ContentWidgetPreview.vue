@@ -3,6 +3,7 @@ import { NodeViewWrapper, nodeViewProps } from '@halo-dev/richtext-editor'
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { getContentWidgetEditorFields } from '@/editor/content-widget-editor-fields'
 import { getContentWidgetDefinitionByTagName } from '@/editor/content-widget-registry'
+import { registerContentWidgetOutsideInteraction } from '@/editor/content-widget-outside-interaction'
 import type { ContentWidgetNodeAttrs } from '@/editor/content-widget-types'
 import ContentWidgetEditorField from './ContentWidgetEditorField.vue'
 import ContentWidgetRenderer from './ContentWidgetRenderer.vue'
@@ -21,6 +22,8 @@ const definition = computed(() => getContentWidgetDefinitionByTagName(widget.val
 const title = computed(() => definition.value?.title || widget.value.title || '文章组件')
 const interactionRoot = ref<HTMLElement | null>(null)
 const editorOpen = ref(false)
+const externalOverlayOpen = ref(false)
+let unregisterOutsideInteraction: (() => void) | undefined
 
 watch(
   () => props.selected,
@@ -40,17 +43,8 @@ function openEditor() {
   editorOpen.value = true
 }
 
-function handleDocumentPointerDown(event: PointerEvent) {
-  if (!editorOpen.value || !interactionRoot.value) {
-    return
-  }
-
-  const target = event.target
-  if (target instanceof globalThis.Node && interactionRoot.value.contains(target)) {
-    return
-  }
-
-  closeEditor()
+function setExternalOverlayOpen(visible: boolean) {
+  externalOverlayOpen.value = visible
 }
 
 function handleEditorKeydown(event: KeyboardEvent) {
@@ -61,12 +55,24 @@ function handleEditorKeydown(event: KeyboardEvent) {
   }
 }
 
-onMounted(() => {
-  document.addEventListener('pointerdown', handleDocumentPointerDown, true)
-})
+function syncOutsideInteraction() {
+  unregisterOutsideInteraction?.()
+  unregisterOutsideInteraction = undefined
+
+  if (!editorOpen.value || !interactionRoot.value) return
+
+  unregisterOutsideInteraction = registerContentWidgetOutsideInteraction({
+    root: () => interactionRoot.value,
+    close: closeEditor,
+    shouldIgnore: () => externalOverlayOpen.value,
+  })
+}
+
+watch(editorOpen, syncOutsideInteraction, { flush: 'post' })
+onMounted(syncOutsideInteraction)
 
 onBeforeUnmount(() => {
-  document.removeEventListener('pointerdown', handleDocumentPointerDown, true)
+  unregisterOutsideInteraction?.()
 })
 
 function updateWidget(nextWidget: ContentWidgetNodeAttrs) {
@@ -149,6 +155,7 @@ function updateWidget(nextWidget: ContentWidgetNodeAttrs) {
             :inline="isInline"
             :class="{ 'content-widget-node__field--half': field.layout === 'half' }"
             @update="updateWidget"
+            @overlay-change="setExternalOverlayOpen"
           />
         </template>
         <span v-else class="content-widget-node__editor-empty">这个组件无需配置。</span>
