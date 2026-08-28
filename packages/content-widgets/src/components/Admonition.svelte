@@ -2,6 +2,7 @@
   import { marked } from "marked";
   import { contentWidgetIcons } from "./icons/contentWidgetIcons";
   import ContentWidgetIcon from "./ContentWidgetIcon.svelte";
+  import { sanitizeMarkdownHtml } from "./sanitizeContentWidgetHtml";
   import {
     safeAppearance,
     safeColor,
@@ -55,11 +56,13 @@
   let customIcon = $derived(icon?.trim() || "");
   let builtInIcon = $derived(contentWidgetIcons[iconName || preset.icon] || "");
   let renderedContent = $derived(
-    marked.parse(content.replace(/^[\u200B-\u200F\uFEFF]/, ""), {
-      async: false,
-      breaks: true,
-      gfm: true,
-    }),
+    sanitizeMarkdownHtml(
+      marked.parse(content.replace(/^[\u200B-\u200F\uFEFF]/, ""), {
+        async: false,
+        breaks: true,
+        gfm: true,
+      }),
+    ),
   );
 </script>
 

@@ -12,15 +12,20 @@ import java.net.InetAddress;
 import java.net.URI;
 import java.net.UnknownHostException;
 import java.net.URLEncoder;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Pattern;
+import org.apache.hc.client5.http.DnsResolver;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.config.ConnectionConfig;
+import org.apache.hc.client5.http.config.RequestConfig;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManagerBuilder;
+import org.apache.hc.core5.http.ClassicHttpResponse;
+import org.apache.hc.core5.util.Timeout;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -52,11 +57,6 @@ public class LinkMetadataEndpoint implements CustomEndpoint {
     );
 
     private final ObjectMapper objectMapper = new ObjectMapper();
-
-    private final HttpClient httpClient = HttpClient.newBuilder()
-        .connectTimeout(Duration.ofSeconds(5))
-        .followRedirects(HttpClient.Redirect.NEVER)
-        .build();
 
     @Override
     public GroupVersion groupVersion() {
@@ -219,37 +219,22 @@ public class LinkMetadataEndpoint implements CustomEndpoint {
     }
 
     private JsonNode fetchJson(URI uri, int redirects) throws Exception {
-        validatePublicHost(uri);
-        var request = HttpRequest.newBuilder(uri)
-            .timeout(REQUEST_TIMEOUT)
-            .header("User-Agent", USER_AGENT)
-            .header("Accept", "application/json,text/json;q=0.9,*/*;q=0.1")
-            .header("Accept-Language", "zh-CN,zh;q=0.9,en;q=0.6")
-            .header("Accept-Encoding", "identity")
-            .GET()
-            .build();
-        var response = httpClient.send(request, HttpResponse.BodyHandlers.ofInputStream());
-        var status = response.statusCode();
+        var response = executePinned(
+            uri,
+            "application/json,text/json;q=0.9,*/*;q=0.1"
+        );
+        var status = response.status();
         if (status >= 300 && status < 400) {
             if (redirects >= MAX_REDIRECTS) {
                 throw new IllegalArgumentException("网站重定向次数过多。");
             }
-            var location = response.headers().firstValue("location")
-                .orElseThrow(() -> new IllegalArgumentException("网站返回了无效重定向。"));
-            try (var ignored = response.body()) {
-                return fetchJson(normalizeAndValidate(uri.resolve(location).toString()), redirects + 1);
-            }
+            var location = requireRedirectLocation(response);
+            return fetchJson(normalizeAndValidate(uri.resolve(location).toString()), redirects + 1);
         }
         if (status < 200 || status >= 300) {
             throw new IllegalArgumentException("目标网站返回 HTTP " + status + "。");
         }
-        try (var body = response.body()) {
-            var bytes = body.readNBytes(MAX_RESPONSE_BYTES + 1);
-            if (bytes.length > MAX_RESPONSE_BYTES) {
-                throw new IllegalArgumentException("网站数据超过 2 MB，已停止读取。");
-            }
-            return objectMapper.readTree(bytes);
-        }
+        return objectMapper.readTree(response.body());
     }
 
     private String jsonLdValue(Document document, String... keys) {
@@ -315,44 +300,94 @@ public class LinkMetadataEndpoint implements CustomEndpoint {
     }
 
     private FetchResult fetch(URI uri, int redirects) throws Exception {
-        validatePublicHost(uri);
-        var request = HttpRequest.newBuilder(uri)
-            .timeout(REQUEST_TIMEOUT)
-            .header("User-Agent", USER_AGENT)
-            .header("Accept", "text/html,application/xhtml+xml;q=0.9,*/*;q=0.1")
-            .header("Accept-Language", "zh-CN,zh;q=0.9,en;q=0.6")
-            .header("Accept-Encoding", "identity")
-            .GET()
-            .build();
-        var response = httpClient.send(request, HttpResponse.BodyHandlers.ofInputStream());
-        var status = response.statusCode();
+        var response = executePinned(
+            uri,
+            "text/html,application/xhtml+xml;q=0.9,*/*;q=0.1"
+        );
+        var status = response.status();
         if (status >= 300 && status < 400) {
             if (redirects >= MAX_REDIRECTS) {
                 throw new IllegalArgumentException("网站重定向次数过多。");
             }
-            var location = response.headers().firstValue("location")
-                .orElseThrow(() -> new IllegalArgumentException("网站返回了无效重定向。"));
-            try (var ignored = response.body()) {
-                return fetch(normalizeAndValidate(uri.resolve(location).toString()), redirects + 1);
-            }
+            var location = requireRedirectLocation(response);
+            return fetch(normalizeAndValidate(uri.resolve(location).toString()), redirects + 1);
         }
         if (status < 200 || status >= 300) {
             throw new IllegalArgumentException("目标网站返回 HTTP " + status + "。");
         }
-        var contentType = response.headers().firstValue("content-type").orElse("")
-            .toLowerCase(Locale.ROOT);
+        var contentType = response.contentType().toLowerCase(Locale.ROOT);
         if (!contentType.isBlank()
             && !contentType.contains("text/html")
             && !contentType.contains("application/xhtml+xml")) {
             throw new IllegalArgumentException("目标地址不是可读取的网页。");
         }
-        try (var body = response.body()) {
-            var bytes = body.readNBytes(MAX_RESPONSE_BYTES + 1);
-            if (bytes.length > MAX_RESPONSE_BYTES) {
-                throw new IllegalArgumentException("网页内容超过 2 MB，已停止读取。");
-            }
-            return new FetchResult(uri, bytes);
+        return new FetchResult(uri, response.body());
+    }
+
+    private RawHttpResponse executePinned(URI uri, String accept) throws Exception {
+        var addresses = resolvePublicAddresses(uri);
+        var connectionManager = PoolingHttpClientConnectionManagerBuilder.create()
+            .setDnsResolver(pinnedDnsResolver(uri.getHost(), addresses))
+            .setDefaultConnectionConfig(ConnectionConfig.custom()
+                .setConnectTimeout(Timeout.ofSeconds(5))
+                .build())
+            .setMaxConnTotal(1)
+            .setMaxConnPerRoute(1)
+            .build();
+        var requestConfig = RequestConfig.custom()
+            .setResponseTimeout(Timeout.ofMilliseconds(REQUEST_TIMEOUT.toMillis()))
+            .setRedirectsEnabled(false)
+            .setContentCompressionEnabled(false)
+            .build();
+        try (var client = HttpClients.custom()
+            .setConnectionManager(connectionManager)
+            .setDefaultRequestConfig(requestConfig)
+            .disableRedirectHandling()
+            .disableAutomaticRetries()
+            .disableCookieManagement()
+            .build()) {
+            var request = new HttpGet(uri);
+            request.setHeader("User-Agent", USER_AGENT);
+            request.setHeader("Accept", accept);
+            request.setHeader("Accept-Language", "zh-CN,zh;q=0.9,en;q=0.6");
+            request.setHeader("Accept-Encoding", "identity");
+            return client.execute(request, LinkMetadataEndpoint::readResponse);
         }
+    }
+
+    private static RawHttpResponse readResponse(ClassicHttpResponse response) throws java.io.IOException {
+        var entity = response.getEntity();
+        var bytes = new byte[0];
+        if (entity != null) {
+            var declaredLength = entity.getContentLength();
+            if (declaredLength > MAX_RESPONSE_BYTES) {
+                throw new IllegalArgumentException("网站数据超过 2 MB，已停止读取。");
+            }
+            try (var body = entity.getContent()) {
+                bytes = body.readNBytes(MAX_RESPONSE_BYTES + 1);
+            }
+            if (bytes.length > MAX_RESPONSE_BYTES) {
+                throw new IllegalArgumentException("网站数据超过 2 MB，已停止读取。");
+            }
+        }
+        return new RawHttpResponse(
+            response.getCode(),
+            firstHeader(response, "location"),
+            firstHeader(response, "content-type"),
+            bytes
+        );
+    }
+
+    private static String firstHeader(ClassicHttpResponse response, String name) {
+        var header = response.getFirstHeader(name);
+        return header == null ? "" : header.getValue();
+    }
+
+    private static String requireRedirectLocation(RawHttpResponse response) {
+        if (response.location().isBlank()) {
+            throw new IllegalArgumentException("网站返回了无效重定向。");
+        }
+        return response.location();
     }
 
     static URI normalizeAndValidate(String rawUrl) {
@@ -392,6 +427,10 @@ public class LinkMetadataEndpoint implements CustomEndpoint {
     }
 
     static void validatePublicHost(URI uri) {
+        resolvePublicAddresses(uri);
+    }
+
+    static InetAddress[] resolvePublicAddresses(URI uri) {
         var host = uri.getHost().toLowerCase(Locale.ROOT);
         if (host.equals("localhost") || host.endsWith(".localhost")
             || host.endsWith(".local") || host.endsWith(".internal")) {
@@ -408,6 +447,31 @@ public class LinkMetadataEndpoint implements CustomEndpoint {
                 throw new IllegalArgumentException("不允许读取本地或内网地址。");
             }
         }
+        return addresses;
+    }
+
+    static DnsResolver pinnedDnsResolver(String expectedHost, InetAddress[] addresses) {
+        var normalizedHost = expectedHost.toLowerCase(Locale.ROOT);
+        var pinnedAddresses = addresses.clone();
+        return new DnsResolver() {
+            @Override
+            public InetAddress[] resolve(String host) throws UnknownHostException {
+                requireExpectedHost(host);
+                return pinnedAddresses.clone();
+            }
+
+            @Override
+            public String resolveCanonicalHostname(String host) throws UnknownHostException {
+                requireExpectedHost(host);
+                return normalizedHost;
+            }
+
+            private void requireExpectedHost(String host) throws UnknownHostException {
+                if (!normalizedHost.equals(host.toLowerCase(Locale.ROOT))) {
+                    throw new UnknownHostException("未授权的目标域名：" + host);
+                }
+            }
+        };
     }
 
     static boolean isPublicAddress(InetAddress address) {
@@ -566,6 +630,9 @@ public class LinkMetadataEndpoint implements CustomEndpoint {
     }
 
     record FetchResult(URI uri, byte[] body) {
+    }
+
+    record RawHttpResponse(int status, String location, String contentType, byte[] body) {
     }
 
     record JsonMetadata(

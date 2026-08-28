@@ -136,6 +136,30 @@ describe('independent content widget additions', () => {
     expect(document.querySelector('.xhhao-com-link-card-icon svg')).not.toBeNull()
   })
 
+  it('sanitizes Markdown HTML and custom SVG icons before rendering', () => {
+    const admonition = document.createElement('xhhao-com-admonition')
+    admonition.setAttribute('show-title', '')
+    admonition.setAttribute(
+      'icon',
+      '<svg viewBox="0 0 24 24" onload="alert(1)"><script>alert(1)</script><foreignObject>unsafe</foreignObject><path d="M2 2h20v20H2z" /></svg>',
+    )
+    admonition.innerHTML =
+      '安全的 **Markdown** <img src="x" onerror="alert(1)"><script>alert(1)</script>'
+    document.body.replaceChildren(admonition)
+
+    mountCustomElements(document)
+
+    const body = document.querySelector('.xhhao-com-admonition-body')
+    const icon = document.querySelector('.xhhao-com-admonition-icon')
+    expect(body?.querySelector('strong')?.textContent).toBe('Markdown')
+    expect(body?.querySelector('script')).toBeNull()
+    expect(body?.querySelector('img')?.hasAttribute('onerror')).toBe(false)
+    expect(icon?.querySelector('script')).toBeNull()
+    expect(icon?.querySelector('foreignObject')).toBeNull()
+    expect(icon?.querySelector('svg')?.hasAttribute('onload')).toBe(false)
+    expect(icon?.querySelector('path')).not.toBeNull()
+  })
+
   it('resets stale automatic colors when metadata changes platform', () => {
     const attributes = applyLinkMetadata(
       {

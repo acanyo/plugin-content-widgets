@@ -1,10 +1,12 @@
 package com.xhhao.contentwidgets;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 import org.junit.jupiter.api.Test;
 
 public class LinkMetadataEndpointTest {
@@ -80,5 +82,23 @@ public class LinkMetadataEndpointTest {
             "https://8.8.8.8/favicon.ico",
             LinkMetadataEndpoint.firstPublicHttpUrl("https://8.8.8.8/favicon.ico")
         );
+    }
+
+    @Test
+    void pinsValidatedDnsAnswersToTheRequestedHost() throws Exception {
+        var expected = new InetAddress[] {
+            InetAddress.getByAddress(new byte[] {8, 8, 8, 8})
+        };
+        var resolver = LinkMetadataEndpoint.pinnedDnsResolver("example.com", expected);
+
+        assertArrayEquals(expected, resolver.resolve("EXAMPLE.COM"));
+        assertThrows(
+            UnknownHostException.class,
+            () -> resolver.resolve("redirected.example.com")
+        );
+
+        var mutableResult = resolver.resolve("example.com");
+        mutableResult[0] = InetAddress.getByAddress(new byte[] {1, 1, 1, 1});
+        assertArrayEquals(expected, resolver.resolve("example.com"));
     }
 }
