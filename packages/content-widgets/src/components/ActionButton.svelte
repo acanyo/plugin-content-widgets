@@ -2,7 +2,12 @@
   import { contentWidgetIcons } from "./icons/contentWidgetIcons";
   import { getActionButtonPreset, type ActionButtonPreset } from "./actionButtonPresets";
   import ContentWidgetIcon from "./ContentWidgetIcon.svelte";
-  import { safeColor, safeHref } from "./contentWidgetRenderUtils";
+  import {
+    safeAppearance,
+    safeColor,
+    safeHref,
+    type ContentWidgetAppearance,
+  } from "./contentWidgetRenderUtils";
 
   type ButtonShape = "square" | "rounded" | "pill";
   type IconPosition = "before" | "after" | "none";
@@ -19,6 +24,7 @@
     gradientEnd,
     textColor,
     content = "前往访问",
+    appearance = "custom",
   }: {
     href?: string;
     target?: string;
@@ -31,17 +37,19 @@
     gradientEnd?: string;
     textColor?: string;
     content?: string;
+    appearance?: ContentWidgetAppearance;
   } = $props();
 
   let rel = $derived(target === "_blank" ? "noopener noreferrer" : undefined);
   let colorPreset = $derived(getActionButtonPreset(preset));
+  let resolvedAppearance = $derived(safeAppearance(appearance));
   let customIcon = $derived(icon?.trim() || "");
   let builtInIcon = $derived(contentWidgetIcons[iconName] || "");
   let showIcon = $derived(iconPosition !== "none" && Boolean(customIcon || builtInIcon));
 </script>
 
 <a
-  class={`xhhao-com-action-button xhhao-com-action-button-shape-${shape}`}
+  class={`xhhao-com-action-button xhhao-com-action-button-shape-${shape} xhhao-com-action-button-appearance-${resolvedAppearance}`}
   style:--xhhao-com-action-start={safeColor(gradientStart, colorPreset.gradientStart)}
   style:--xhhao-com-action-end={safeColor(gradientEnd, colorPreset.gradientEnd)}
   style:--xhhao-com-action-text={safeColor(textColor, colorPreset.textColor)}

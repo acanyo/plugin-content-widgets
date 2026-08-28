@@ -2,7 +2,11 @@
   import { marked } from "marked";
   import { contentWidgetIcons } from "./icons/contentWidgetIcons";
   import ContentWidgetIcon from "./ContentWidgetIcon.svelte";
-  import { safeColor } from "./contentWidgetRenderUtils";
+  import {
+    safeAppearance,
+    safeColor,
+    type ContentWidgetAppearance,
+  } from "./contentWidgetRenderUtils";
 
   type AdmonitionType = "tip" | "info" | "warning" | "danger" | "success" | "question" | "example" | "quote" | "bug";
 
@@ -27,6 +31,7 @@
     accentColor,
     backgroundColor,
     textColor,
+    appearance = "custom",
     icon,
     iconName,
     content = "这里写提示内容。",
@@ -39,12 +44,14 @@
     accentColor?: string;
     backgroundColor?: string;
     textColor?: string;
+    appearance?: ContentWidgetAppearance;
     icon?: string;
     iconName?: string;
     content?: string;
   } = $props();
 
   let preset = $derived(presets[type] || presets.tip);
+  let resolvedAppearance = $derived(safeAppearance(appearance));
   let customIcon = $derived(icon?.trim() || "");
   let builtInIcon = $derived(contentWidgetIcons[iconName || preset.icon] || "");
   let renderedContent = $derived(
@@ -57,10 +64,10 @@
 </script>
 
 <aside
-  class={`xhhao-com-admonition xhhao-com-admonition-type-${type}`}
-  style:--xhhao-com-admonition-accent={safeColor(accentColor, preset.accent)}
-  style:--xhhao-com-admonition-bg={safeColor(backgroundColor, preset.background)}
-  style:--xhhao-com-admonition-text={safeColor(textColor, preset.text)}
+  class={`xhhao-com-admonition xhhao-com-admonition-type-${type} xhhao-com-admonition-appearance-${resolvedAppearance}`}
+  style:--xhhao-com-admonition-accent-source={safeColor(accentColor, preset.accent)}
+  style:--xhhao-com-admonition-bg-source={safeColor(backgroundColor, preset.background)}
+  style:--xhhao-com-admonition-text-source={safeColor(textColor, preset.text)}
 >
   {#if collapsible}
     <details open={defaultOpen}>

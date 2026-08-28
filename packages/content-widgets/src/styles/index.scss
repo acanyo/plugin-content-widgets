@@ -16,7 +16,7 @@
   --xhhao-com-base-font-monospace: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
 }
 
-:where(.dark, [data-color-scheme="dark"], [data-theme="dark"]) {
+:where(.dark, .color-scheme-dark, [data-color-scheme="dark"], [data-theme="dark"]) {
   --xhhao-com-base-text: #e5e7eb;
   --xhhao-com-base-text-strong: #f9fafb;
   --xhhao-com-base-text-muted: #a1a1aa;

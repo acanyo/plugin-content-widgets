@@ -2,7 +2,13 @@
   import { contentWidgetIcons } from "./icons/contentWidgetIcons";
   import { getLinkCardPreset, type LinkCardPreset } from "./linkCardPresets";
   import ContentWidgetIcon from "./ContentWidgetIcon.svelte";
-  import { safeColor, safeHref, safeImage } from "./contentWidgetRenderUtils";
+  import {
+    safeAppearance,
+    safeColor,
+    safeHref,
+    safeImage,
+    type ContentWidgetAppearance,
+  } from "./contentWidgetRenderUtils";
 
   let {
     preset = "github",
@@ -18,6 +24,7 @@
     iconName,
     image,
     showImage = false,
+    appearance = "custom",
   }: {
     preset?: LinkCardPreset;
     href?: string;
@@ -32,9 +39,11 @@
     iconName?: string;
     image?: string;
     showImage?: boolean;
+    appearance?: ContentWidgetAppearance;
   } = $props();
 
   let config = $derived(getLinkCardPreset(preset));
+  let resolvedAppearance = $derived(safeAppearance(appearance));
   let customIcon = $derived(icon?.trim() || "");
   let builtInIcon = $derived(contentWidgetIcons[iconName || config.icon] || "");
   let imageUrl = $derived(safeImage(image));
@@ -42,10 +51,10 @@
 </script>
 
 <a
-  class="xhhao-com-link-card"
-  style:--xhhao-com-link-card-accent={safeColor(accentColor, config.accentColor)}
-  style:--xhhao-com-link-card-bg={safeColor(backgroundColor, config.backgroundColor)}
-  style:--xhhao-com-link-card-text={safeColor(textColor, config.textColor)}
+  class={`xhhao-com-link-card xhhao-com-link-card-appearance-${resolvedAppearance}`}
+  style:--xhhao-com-link-card-accent-source={safeColor(accentColor, config.accentColor)}
+  style:--xhhao-com-link-card-bg-source={safeColor(backgroundColor, config.backgroundColor)}
+  style:--xhhao-com-link-card-text-source={safeColor(textColor, config.textColor)}
   href={safeHref(href)}
   {target}
   {rel}

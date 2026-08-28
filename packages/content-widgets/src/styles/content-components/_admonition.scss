@@ -1,4 +1,10 @@
+@use "../theme";
+
 .xhhao-com-admonition {
+  --xhhao-com-admonition-accent: var(--xhhao-com-admonition-accent-source, #0ea5e9);
+  --xhhao-com-admonition-bg: var(--xhhao-com-admonition-bg-source, #f0f9ff);
+  --xhhao-com-admonition-text: var(--xhhao-com-admonition-text-source, #0c4a6e);
+
   box-sizing: border-box;
   margin: 1em 0;
   overflow: hidden;
@@ -126,5 +132,30 @@
     > :last-child {
       margin-bottom: 0;
     }
+  }
+}
+
+@mixin xhhao-com-admonition-dark-surface {
+  --xhhao-com-admonition-accent: color-mix(
+    in srgb,
+    var(--xhhao-com-admonition-accent-source, #0ea5e9) 74%,
+    #fff
+  );
+  --xhhao-com-admonition-bg: color-mix(
+    in srgb,
+    var(--xhhao-com-admonition-accent-source, #0ea5e9) 11%,
+    #18181b
+  );
+  --xhhao-com-admonition-text: #e5e7eb;
+  box-shadow: 0 0.3em 1em rgb(0 0 0 / 22%);
+}
+
+.xhhao-com-admonition-appearance-dark {
+  @include xhhao-com-admonition-dark-surface;
+}
+
+.xhhao-com-admonition-appearance-auto {
+  @include theme.when-dark {
+    @include xhhao-com-admonition-dark-surface;
   }
 }

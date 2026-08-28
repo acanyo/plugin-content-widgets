@@ -1,4 +1,12 @@
+@use "../theme";
+
 .xhhao-com-link-card {
+  --xhhao-com-link-card-accent: var(--xhhao-com-link-card-accent-source, #1769ff);
+  --xhhao-com-link-card-bg: var(--xhhao-com-link-card-bg-source, #eff6ff);
+  --xhhao-com-link-card-text: var(--xhhao-com-link-card-text-source, #172554);
+  --xhhao-com-link-card-shadow: rgb(15 23 42 / 10%);
+  --xhhao-com-link-card-shadow-hover: rgb(15 23 42 / 16%);
+
   position: relative;
   isolation: isolate;
   box-sizing: border-box !important;
@@ -18,7 +26,7 @@
   border-radius: 1rem !important;
   background: var(--xhhao-com-link-card-bg) !important;
   color: var(--xhhao-com-link-card-text) !important;
-  box-shadow: 0 10px 28px rgb(15 23 42 / 10%) !important;
+  box-shadow: 0 10px 28px var(--xhhao-com-link-card-shadow) !important;
   font-family: inherit !important;
   font-size: 1rem !important;
   font-style: normal !important;
@@ -58,7 +66,7 @@
     border-color: color-mix(in srgb, var(--xhhao-com-link-card-accent) 68%, transparent) !important;
     background: var(--xhhao-com-link-card-bg) !important;
     color: var(--xhhao-com-link-card-text) !important;
-    box-shadow: 0 16px 38px rgb(15 23 42 / 16%) !important;
+    box-shadow: 0 16px 38px var(--xhhao-com-link-card-shadow-hover) !important;
     text-decoration: none !important;
     transform: translateY(-2px);
   }
@@ -231,6 +239,32 @@
   &:hover .xhhao-com-link-card-arrow {
     background: color-mix(in srgb, var(--xhhao-com-link-card-accent) 22%, transparent) !important;
     transform: translateX(2px);
+  }
+}
+
+@mixin xhhao-com-link-card-dark-surface {
+  --xhhao-com-link-card-accent: color-mix(
+    in srgb,
+    var(--xhhao-com-link-card-accent-source, #1769ff) 72%,
+    #fff
+  );
+  --xhhao-com-link-card-bg: color-mix(
+    in srgb,
+    var(--xhhao-com-link-card-accent-source, #1769ff) 10%,
+    #18181b
+  );
+  --xhhao-com-link-card-text: #f4f4f5;
+  --xhhao-com-link-card-shadow: rgb(0 0 0 / 22%);
+  --xhhao-com-link-card-shadow-hover: rgb(0 0 0 / 32%);
+}
+
+.xhhao-com-link-card-appearance-dark {
+  @include xhhao-com-link-card-dark-surface;
+}
+
+.xhhao-com-link-card-appearance-auto {
+  @include theme.when-dark {
+    @include xhhao-com-link-card-dark-surface;
   }
 }
 

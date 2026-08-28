@@ -162,6 +162,14 @@ const iconPositionOptions = [
   { label: '文字后', value: 'after' },
 ]
 
+const appearanceOptions = [
+  { label: '保持当前配色（旧内容）', value: '' },
+  { label: '跟随博客主题', value: 'auto' },
+  { label: '始终浅色', value: 'light' },
+  { label: '始终暗色', value: 'dark' },
+  { label: '自定义 / 兼容旧文章', value: 'custom' },
+]
+
 const contentWidgetIconOptions = contentWidgetIconDefinitions.map((icon) => ({
   label: icon.label,
   value: icon.value,
@@ -194,7 +202,8 @@ export const contentWidgetEditorFields: Record<string, ContentWidgetEditorField[
   ],
   'xhhao-com-admonition': [
     halfField(attrField('type', '类型', 'select', undefined, admonitionTypeOptions)),
-    halfField(attrField('title', '自定义标题', 'text', '留空时跟随类型')),
+    halfField(attrField('appearance', '外观模式', 'select', undefined, appearanceOptions)),
+    attrField('title', '自定义标题', 'text', '留空时跟随类型'),
     halfField(attrField('show-title', '显示标题', 'checkbox')),
     halfField(attrField('collapsible', '允许折叠', 'checkbox')),
     halfField(attrField('default-open', '默认展开', 'checkbox')),
@@ -322,6 +331,7 @@ export const contentWidgetEditorFields: Record<string, ContentWidgetEditorField[
   ],
   'xhhao-com-link-card': [
     linkCardManualField(halfField(attrField('preset', '常用预设', 'select', undefined, linkCardPresetOptions))),
+    halfField(attrField('appearance', '外观模式', 'select', undefined, appearanceOptions)),
     linkCardManualField(halfField(attrField('target', '打开方式', 'select', undefined, targetOptions))),
     linkCardManualField(halfField(attrField('label', '顶部标签', 'text', '留空时跟随预设'))),
     linkCardManualField(halfField(attrField('title', '标题', 'text', '留空时跟随预设'))),
@@ -437,6 +447,7 @@ export const contentWidgetEditorFields: Record<string, ContentWidgetEditorField[
   ],
   'xhhao-com-action-button': [
     attrField('preset', '配色预设', 'select', undefined, actionButtonPresetOptions),
+    attrField('appearance', '外观模式', 'select', undefined, appearanceOptions),
     halfField(attrField('shape', '圆角', 'select', undefined, buttonShapeOptions)),
     halfField(attrField('target', '打开方式', 'select', undefined, targetOptions)),
     attrField('href', '链接', 'text', 'https://example.com'),

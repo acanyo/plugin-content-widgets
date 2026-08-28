@@ -35,6 +35,9 @@ describe('independent content widget additions', () => {
     expect(additions.admonition).toMatchObject({ category: '提示', kind: 'block' })
     expect(additions['link-card']).toMatchObject({ category: '布局', kind: 'block' })
     expect(additions['action-button']).toMatchObject({ category: '展示', kind: 'inline' })
+    expect(additions.admonition.attributes?.appearance).toBe('auto')
+    expect(additions['link-card'].attributes?.appearance).toBe('auto')
+    expect(additions['action-button'].attributes?.appearance).toBe('auto')
   })
 
   it('provides visual color and icon controls for all three additions', () => {
@@ -46,6 +49,14 @@ describe('independent content widget additions', () => {
       const fields = contentWidgetEditorFields[tagName]
       expect(fields.some((field) => field.type === 'color')).toBe(true)
       expect(fields.some((field) => field.type === 'icon')).toBe(true)
+      const appearance = fields.find((field) => field.name === 'appearance')
+      expect(appearance?.options?.map((option) => option.value)).toEqual([
+        '',
+        'auto',
+        'light',
+        'dark',
+        'custom',
+      ])
     }
 
     const noIcon = contentWidgetEditorFields['xhhao-com-action-button']
@@ -107,18 +118,21 @@ describe('independent content widget additions', () => {
     document.body.innerHTML = `
       <xhhao-com-button href="#">访问链接</xhhao-com-button>
       <xhhao-com-action-button href="#" shape="pill" icon-position="none">前往访问</xhhao-com-action-button>
-      <xhhao-com-admonition type="success" show-title>支持 **Markdown**。</xhhao-com-admonition>
-      <xhhao-com-link-card preset="github" href="#"></xhhao-com-link-card>
+      <xhhao-com-admonition type="success" appearance="auto" show-title>支持 **Markdown**。</xhhao-com-admonition>
+      <xhhao-com-link-card preset="github" appearance="dark" href="#"></xhhao-com-link-card>
     `
 
     mountCustomElements(document)
 
     expect(document.querySelector('.xhhao-com-button')?.textContent).toContain('访问链接')
     expect(document.querySelector('.xhhao-com-action-button-shape-pill')).not.toBeNull()
+    expect(document.querySelector('.xhhao-com-action-button-appearance-custom')).not.toBeNull()
     expect(document.querySelector('.xhhao-com-action-button-icon')).toBeNull()
+    expect(document.querySelector('.xhhao-com-admonition-appearance-auto')).not.toBeNull()
     expect(document.querySelector('.xhhao-com-admonition-title')?.textContent).toContain('成功')
     expect(document.querySelector('.xhhao-com-admonition-body strong')?.textContent).toBe('Markdown')
     expect(document.querySelector('.xhhao-com-link-card-title')?.textContent).toContain('GitHub')
+    expect(document.querySelector('.xhhao-com-link-card-appearance-dark')).not.toBeNull()
     expect(document.querySelector('.xhhao-com-link-card-icon svg')).not.toBeNull()
   })
 

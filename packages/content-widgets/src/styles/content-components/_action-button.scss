@@ -1,4 +1,17 @@
+@use "../theme";
+
 a.xhhao-com-action-button.xhhao-com-action-button {
+  --xhhao-com-action-shadow: color-mix(
+    in srgb,
+    var(--xhhao-com-action-start, #0ea5ff) 24%,
+    transparent
+  );
+  --xhhao-com-action-shadow-hover: color-mix(
+    in srgb,
+    var(--xhhao-com-action-start, #0ea5ff) 32%,
+    transparent
+  );
+
   display: inline-flex !important;
   align-items: center;
   gap: 0.45em;
@@ -19,14 +32,14 @@ a.xhhao-com-action-button.xhhao-com-action-button {
   line-height: 1.35 !important;
   text-decoration: none !important;
   text-indent: 0;
-  box-shadow: 0 0.45em 1.1em color-mix(in srgb, var(--xhhao-com-action-start, #0ea5ff) 24%, transparent);
+  box-shadow: 0 0.45em 1.1em var(--xhhao-com-action-shadow);
   transition: transform 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease;
 
   &:hover {
     color: var(--xhhao-com-action-text, #fff) !important;
     filter: saturate(1.08) brightness(1.03);
     transform: translateY(-1px);
-    box-shadow: 0 0.7em 1.45em color-mix(in srgb, var(--xhhao-com-action-start, #0ea5ff) 32%, transparent);
+    box-shadow: 0 0.7em 1.45em var(--xhhao-com-action-shadow-hover);
   }
 
   &.xhhao-com-action-button-shape-square {
@@ -66,5 +79,28 @@ a.xhhao-com-action-button.xhhao-com-action-button {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+  }
+}
+
+@mixin xhhao-com-action-button-dark-shadow {
+  --xhhao-com-action-shadow: color-mix(
+    in srgb,
+    var(--xhhao-com-action-start, #0ea5ff) 14%,
+    transparent
+  );
+  --xhhao-com-action-shadow-hover: color-mix(
+    in srgb,
+    var(--xhhao-com-action-start, #0ea5ff) 22%,
+    transparent
+  );
+}
+
+a.xhhao-com-action-button-appearance-dark.xhhao-com-action-button {
+  @include xhhao-com-action-button-dark-shadow;
+}
+
+a.xhhao-com-action-button-appearance-auto.xhhao-com-action-button {
+  @include theme.when-dark {
+    @include xhhao-com-action-button-dark-shadow;
   }
 }
