@@ -12,6 +12,8 @@
 
 ![编辑器组件选择](./images/editor.png)
 
+![组件收藏](./images/favorites.png)
+
 ![前台渲染效果](./images/preview.png)
 
 ## 内置组件
