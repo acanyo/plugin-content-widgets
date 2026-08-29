@@ -15,10 +15,10 @@
   align-items: center !important;
   gap: 1rem !important;
   width: 100% !important;
-  max-width: 100% !important;
+  max-width: min(100%, var(--xhhao-com-content-max-width, 1320px)) !important;
   min-width: 0 !important;
   min-height: 7.25rem !important;
-  margin: 1rem 0 !important;
+  margin: 1rem auto !important;
   padding: 1rem 1.1rem !important;
   overflow: hidden !important;
   border: 1px solid color-mix(in srgb, var(--xhhao-com-link-card-accent) 38%, transparent) !important;

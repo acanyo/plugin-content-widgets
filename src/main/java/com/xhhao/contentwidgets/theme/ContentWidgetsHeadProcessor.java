@@ -36,8 +36,8 @@ public class ContentWidgetsHeadProcessor implements TemplateHeadProcessor {
 
         return PROPERTY_PLACEHOLDER_HELPER.replacePlaceholders("""
             <!-- plugin-content-widgets start -->
-            <script src="/plugins/${name}/assets/static/content-widgets.iife.js?version=${version}"></script>
             <link rel="stylesheet" href="/plugins/${name}/assets/static/content-widgets.css?version=${version}" />
+            <script defer src="/plugins/${name}/assets/static/content-widgets.iife.js?version=${version}"></script>
             <!-- plugin-content-widgets end -->
             """, properties);
     }

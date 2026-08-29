@@ -44,9 +44,15 @@ function mountWhenReady() {
   mountCustomElements();
 }
 
+function remountAfterPageNavigation() {
+  mountCustomElements();
+}
+
 if (typeof window !== "undefined") {
   window.XhhaoComContentWidgets = {
     mount: mountCustomElements,
   };
+
+  document.addEventListener("pjax:complete", remountAfterPageNavigation);
   mountWhenReady();
 }
