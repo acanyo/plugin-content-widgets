@@ -2,10 +2,8 @@
 
 .xhhao-com-link-card {
   --xhhao-com-link-card-accent: var(--xhhao-com-link-card-accent-source, #1769ff);
-  --xhhao-com-link-card-bg: var(--xhhao-com-link-card-bg-source, #eff6ff);
-  --xhhao-com-link-card-text: var(--xhhao-com-link-card-text-source, #172554);
-  --xhhao-com-link-card-shadow: rgb(15 23 42 / 10%);
-  --xhhao-com-link-card-shadow-hover: rgb(15 23 42 / 16%);
+  --xhhao-com-link-card-bg: var(--xhhao-com-link-card-bg-source, #fff);
+  --xhhao-com-link-card-text: var(--xhhao-com-link-card-text-source, #1f2937);
 
   position: relative;
   isolation: isolate;
@@ -13,22 +11,23 @@
   display: grid !important;
   grid-template-columns: auto minmax(0, 1fr) auto auto !important;
   align-items: center !important;
-  gap: 1rem !important;
+  gap: 0.75em !important;
   width: 100% !important;
   max-width: min(100%, var(--xhhao-com-content-max-width, 1320px)) !important;
   min-width: 0 !important;
-  min-height: 7.25rem !important;
+  min-height: 5rem !important;
   margin: 1rem auto !important;
-  padding: 1rem 1.1rem !important;
+  padding: 0.85em 1em !important;
   overflow: hidden !important;
-  border: 1px solid color-mix(in srgb, var(--xhhao-com-link-card-accent) 38%, transparent) !important;
-  border-inline-start: 0.3rem solid var(--xhhao-com-link-card-accent) !important;
-  border-radius: 1rem !important;
+  border: 1px solid var(--xhhao-com-border, #e5e7eb) !important;
+  border-inline-start-width: 1px !important;
+  border-radius: 0.5em !important;
   background: var(--xhhao-com-link-card-bg) !important;
   color: var(--xhhao-com-link-card-text) !important;
-  box-shadow: 0 10px 28px var(--xhhao-com-link-card-shadow) !important;
+
+  box-shadow: none !important;
   font-family: inherit !important;
-  font-size: 1rem !important;
+  font-size: inherit !important;
   font-style: normal !important;
   font-weight: 400 !important;
   letter-spacing: normal !important;
@@ -37,24 +36,11 @@
   text-decoration: none !important;
   text-indent: 0 !important;
   text-shadow: none !important;
-  transition:
-    transform 160ms ease,
-    border-color 160ms ease,
-    box-shadow 160ms ease !important;
+  transition: border-color 160ms ease !important;
 
   &::before {
-    position: absolute !important;
-    inset: 0 !important;
-    z-index: -1 !important;
-    display: block !important;
-    border: 0 !important;
-    background: radial-gradient(
-      circle at 0 0,
-      color-mix(in srgb, var(--xhhao-com-link-card-accent) 20%, transparent),
-      transparent 48%
-    ) !important;
-    content: "" !important;
-    pointer-events: none !important;
+    display: none !important;
+    content: none !important;
   }
 
   &::after {
@@ -66,9 +52,9 @@
     border-color: color-mix(in srgb, var(--xhhao-com-link-card-accent) 68%, transparent) !important;
     background: var(--xhhao-com-link-card-bg) !important;
     color: var(--xhhao-com-link-card-text) !important;
-    box-shadow: 0 16px 38px var(--xhhao-com-link-card-shadow-hover) !important;
+
+  box-shadow: none !important;
     text-decoration: none !important;
-    transform: translateY(-2px);
   }
 
   &:focus-visible {
@@ -90,11 +76,11 @@
   }
 
   .xhhao-com-link-card-icon {
-    width: 3.25rem !important;
-    height: 3.25rem !important;
+    width: 2.5em !important;
+    height: 2.5em !important;
     border: 1px solid color-mix(in srgb, var(--xhhao-com-link-card-accent) 32%, transparent) !important;
-    border-radius: 0.85rem !important;
-    background: color-mix(in srgb, var(--xhhao-com-link-card-accent) 14%, transparent) !important;
+    border-radius: 0.4em !important;
+    background: transparent !important;
     font-size: 1.3rem !important;
     line-height: 1 !important;
 
@@ -135,14 +121,14 @@
     background: transparent !important;
     color: var(--xhhao-com-link-card-accent) !important;
     font-family: inherit !important;
-    font-size: 0.68rem !important;
+    font-size: 0.75em !important;
     font-style: normal !important;
-    font-weight: 800 !important;
-    letter-spacing: 0.13em !important;
+    font-weight: 400 !important;
+    letter-spacing: normal !important;
     line-height: 1.2 !important;
     text-decoration: none !important;
     text-overflow: ellipsis !important;
-    text-transform: uppercase !important;
+    text-transform: none !important;
     white-space: nowrap !important;
   }
 
@@ -155,9 +141,9 @@
     background: transparent !important;
     color: inherit !important;
     font-family: inherit !important;
-    font-size: 1.05rem !important;
+    font-size: 1em !important;
     font-style: normal !important;
-    font-weight: 750 !important;
+    font-weight: 600 !important;
     letter-spacing: normal !important;
     line-height: 1.35 !important;
     text-decoration: none !important;
@@ -174,7 +160,7 @@
     background: transparent !important;
     color: inherit !important;
     font-family: inherit !important;
-    font-size: 0.86rem !important;
+    font-size: 0.875em !important;
     font-style: normal !important;
     font-weight: 400 !important;
     letter-spacing: normal !important;
@@ -218,7 +204,7 @@
     height: 2.25rem !important;
     border: 0 !important;
     border-radius: 999px !important;
-    background: color-mix(in srgb, var(--xhhao-com-link-card-accent) 14%, transparent) !important;
+    background: transparent !important;
     transition:
       transform 160ms ease,
       background-color 160ms ease !important;
@@ -237,9 +223,13 @@
   }
 
   &:hover .xhhao-com-link-card-arrow {
-    background: color-mix(in srgb, var(--xhhao-com-link-card-accent) 22%, transparent) !important;
-    transform: translateX(2px);
+    background: transparent !important;
   }
+}
+
+.xhhao-com-link-card-appearance-auto {
+  --xhhao-com-link-card-bg: var(--xhhao-com-link-card-bg-source, var(--xhhao-com-bg-card));
+  --xhhao-com-link-card-text: var(--xhhao-com-link-card-text-source, var(--xhhao-com-text));
 }
 
 @mixin xhhao-com-link-card-dark-surface {
@@ -248,14 +238,8 @@
     var(--xhhao-com-link-card-accent-source, #1769ff) 72%,
     #fff
   );
-  --xhhao-com-link-card-bg: color-mix(
-    in srgb,
-    var(--xhhao-com-link-card-accent-source, #1769ff) 10%,
-    #18181b
-  );
-  --xhhao-com-link-card-text: #f4f4f5;
-  --xhhao-com-link-card-shadow: rgb(0 0 0 / 22%);
-  --xhhao-com-link-card-shadow-hover: rgb(0 0 0 / 32%);
+  --xhhao-com-link-card-bg: var(--xhhao-com-link-card-bg-source, #18181b);
+  --xhhao-com-link-card-text: var(--xhhao-com-link-card-text-source, #f4f4f5);
 }
 
 .xhhao-com-link-card-appearance-dark {
@@ -272,7 +256,7 @@
   .xhhao-com-link-card {
     grid-template-columns: auto minmax(0, 1fr) auto !important;
     gap: 0.75rem !important;
-    min-height: 6.5rem !important;
+    min-height: 5rem !important;
     padding: 0.85rem !important;
 
     .xhhao-com-link-card-icon {
@@ -288,4 +272,8 @@
       display: none !important;
     }
   }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .xhhao-com-link-card, .xhhao-com-link-card .xhhao-com-link-card-arrow { transition: none !important; }
 }

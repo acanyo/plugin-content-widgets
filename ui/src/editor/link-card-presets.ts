@@ -1,4 +1,4 @@
-import { getLinkCardPreset } from '@xhhao/content-widgets'
+import { getLinkCardPreset } from '@xhhao/content-widgets/presets'
 
 const LINK_CARD_PRESET_DERIVED_ATTRIBUTES = [
   'label',

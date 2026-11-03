@@ -2,12 +2,18 @@
 
 import { describe, expect, it } from 'vitest'
 import { mountCustomElements } from '@xhhao/content-widgets'
-import { contentWidgetEditorFields } from '../content-widget-editor-fields'
-import { contentWidgetDefinitions } from '../content-widget-registry'
+import { contentWidgetDefinitions, getContentWidgetEditorFields } from '../content-widget-registry'
 import { applyLinkMetadata } from '../link-metadata'
 import { applyLinkCardPreset } from '../link-card-presets'
 import { applyActionButtonPreset } from '../action-button-presets'
 import { applyContentWidgetFieldValue } from '../content-widget-field-handlers'
+
+const contentWidgetEditorFields = Object.fromEntries(
+  contentWidgetDefinitions.map((definition) => [
+    definition.tagName,
+    getContentWidgetEditorFields(definition.tagName),
+  ]),
+)
 
 describe('independent content widget additions', () => {
   it('leaves the original button definition unchanged', () => {
@@ -63,15 +69,14 @@ describe('independent content widget additions', () => {
       .find((field) => field.name === 'icon-name')
       ?.options?.find((option) => option.value === 'none')
     expect(noIcon?.label).toBe('不显示')
-    const colorPresets = contentWidgetEditorFields['xhhao-com-action-button']
-      .find((field) => field.name === 'preset')
-      ?.options || []
+    const colorPresets =
+      contentWidgetEditorFields['xhhao-com-action-button'].find((field) => field.name === 'preset')
+        ?.options || []
     expect(colorPresets.some((option) => option.value === 'sunset-gradient')).toBe(true)
     expect(colorPresets.some((option) => option.value === 'green-solid')).toBe(true)
     expect(
-      contentWidgetEditorFields['xhhao-com-link-card'].filter(
-        (field) => field.layout === 'half',
-      ).length,
+      contentWidgetEditorFields['xhhao-com-link-card'].filter((field) => field.layout === 'half')
+        .length,
     ).toBeGreaterThan(1)
   })
 
@@ -130,7 +135,9 @@ describe('independent content widget additions', () => {
     expect(document.querySelector('.xhhao-com-action-button-icon')).toBeNull()
     expect(document.querySelector('.xhhao-com-admonition-appearance-auto')).not.toBeNull()
     expect(document.querySelector('.xhhao-com-admonition-title')?.textContent).toContain('成功')
-    expect(document.querySelector('.xhhao-com-admonition-body strong')?.textContent).toBe('Markdown')
+    expect(document.querySelector('.xhhao-com-admonition-body strong')?.textContent).toBe(
+      'Markdown',
+    )
     expect(document.querySelector('.xhhao-com-link-card-title')?.textContent).toContain('GitHub')
     expect(document.querySelector('.xhhao-com-link-card-appearance-dark')).not.toBeNull()
     expect(document.querySelector('.xhhao-com-link-card-icon svg')).not.toBeNull()

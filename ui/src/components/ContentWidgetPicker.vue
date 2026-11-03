@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import '@/styles/content-widget-editor.css'
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { contentWidgetCategories, contentWidgetDefinitions } from '@/editor/content-widget-registry'
 import { definitionToNodeAttrs } from '@/editor/content-widget-html'
@@ -11,8 +12,8 @@ import {
 import type { ContentWidgetDefinition } from '@/editor/content-widget-types'
 import ContentWidgetRenderer from './ContentWidgetRenderer.vue'
 import IconClose from '~icons/ri/close-line'
-import IconHeartFill from '~icons/ri/heart-fill'
-import IconHeartLine from '~icons/ri/heart-line'
+import IconStarFill from '~icons/ri/star-fill'
+import IconStarLine from '~icons/ri/star-line'
 import IconSearch from '~icons/ri/search-line'
 
 const emit = defineEmits<{
@@ -58,7 +59,7 @@ const filteredWidgets = computed(() => {
 const previewWidget = (widget: ContentWidgetDefinition) => definitionToNodeAttrs(widget)
 const emptyMessage = computed(() =>
   activeCategory.value === favoriteCategory && !keyword.value.trim()
-    ? '还没有收藏组件，点击组件卡片上的爱心即可收藏'
+    ? '还没有收藏组件，点击组件卡片上的星标即可收藏'
     : '没有找到匹配的组件',
 )
 
@@ -167,8 +168,8 @@ onBeforeUnmount(() => window.removeEventListener('storage', handleStorage))
                 :title="isFavorite(widget.id) ? '取消收藏' : '收藏'"
                 @click.stop="toggleFavorite(widget.id)"
               >
-                <IconHeartFill v-if="isFavorite(widget.id)" />
-                <IconHeartLine v-else />
+                <IconStarFill v-if="isFavorite(widget.id)" />
+                <IconStarLine v-else />
               </button>
             </article>
 
@@ -191,19 +192,19 @@ onBeforeUnmount(() => window.removeEventListener('storage', handleStorage))
   place-items: center;
   padding: 24px;
   background: rgb(15 23 42 / 0.4);
-  backdrop-filter: blur(8px);
 }
 
 .content-widget-picker-dialog {
   display: grid;
   grid-template-rows: auto minmax(0, 1fr);
   width: min(980px, calc(100vw - 32px));
-  max-height: min(82vh, 760px);
+  height: min(82vh, 760px);
+  max-height: calc(100dvh - 32px);
   overflow: hidden;
   border: 1px solid rgb(229 231 235 / 0.9);
-  border-radius: 12px;
-  background: #fff;
-  box-shadow: 0 28px 90px rgb(15 23 42 / 0.3);
+  border-radius: 8px;
+  background: var(--cw-editor-bg);
+  box-shadow: 0 12px 36px rgb(0 0 0 / 0.18);
 }
 
 .content-widget-picker__header {
@@ -212,14 +213,14 @@ onBeforeUnmount(() => window.removeEventListener('storage', handleStorage))
   justify-content: space-between;
   gap: 16px;
   padding: 18px 18px 14px;
-  border-bottom: 1px solid #eef2f7;
+  border-bottom: 1px solid var(--cw-editor-border);
 }
 
 .content-widget-picker__header h2 {
   margin: 0;
-  color: #111827;
+  color: var(--cw-editor-text);
   font-size: 18px;
-  font-weight: 700;
+  font-weight: 600;
   line-height: 1.4;
 }
 
@@ -230,7 +231,7 @@ onBeforeUnmount(() => window.removeEventListener('storage', handleStorage))
 
 .content-widget-picker__header p {
   margin: 0;
-  color: #6b7280;
+  color: var(--cw-editor-muted);
   font-size: 13px;
   line-height: 1.4;
 }
@@ -243,7 +244,7 @@ onBeforeUnmount(() => window.removeEventListener('storage', handleStorage))
   border: none;
   border-radius: 6px;
   background: transparent;
-  color: #6b7280;
+  color: var(--cw-editor-muted);
   font-size: 22px;
   line-height: 1;
   cursor: pointer;
@@ -255,8 +256,8 @@ onBeforeUnmount(() => window.removeEventListener('storage', handleStorage))
 }
 
 .content-widget-picker__close:hover {
-  background: #f3f4f6;
-  color: #111827;
+  background: var(--cw-editor-hover);
+  color: var(--cw-editor-text);
 }
 
 .content-widget-picker__body {
@@ -271,8 +272,8 @@ onBeforeUnmount(() => window.removeEventListener('storage', handleStorage))
   gap: 4px;
   min-height: 0;
   padding: 14px 10px;
-  border-right: 1px solid #eef2f7;
-  background: #f8fafc;
+  border-right: 1px solid var(--cw-editor-border);
+  background: var(--cw-editor-panel);
 }
 
 .content-widget-picker__sidebar button {
@@ -286,7 +287,7 @@ onBeforeUnmount(() => window.removeEventListener('storage', handleStorage))
   border: 1px solid transparent;
   border-radius: 6px;
   background: transparent;
-  color: #4b5563;
+  color: var(--cw-editor-text);
   cursor: pointer;
   font-size: 13px;
   line-height: 1;
@@ -294,20 +295,20 @@ onBeforeUnmount(() => window.removeEventListener('storage', handleStorage))
 }
 
 .content-widget-picker__sidebar button:hover {
-  background: #fff;
-  color: #111827;
+  background: var(--cw-editor-bg);
+  color: var(--cw-editor-text);
 }
 
 .content-widget-picker__sidebar button.is-active {
-  border-color: #bfdbfe;
-  background: #fff;
-  color: #1d4ed8;
-  font-weight: 700;
-  box-shadow: 0 1px 2px rgb(15 23 42 / 0.06);
+  border-color: var(--cw-editor-border);
+  background: var(--cw-editor-bg);
+  color: var(--cw-editor-accent);
+  font-weight: 600;
+  box-shadow: none;
 }
 
 .content-widget-picker__sidebar em {
-  color: #9ca3af;
+  color: var(--cw-editor-muted);
   font-style: normal;
   font-size: 12px;
 }
@@ -328,14 +329,14 @@ onBeforeUnmount(() => window.removeEventListener('storage', handleStorage))
   gap: 8px;
   height: 38px;
   padding: 0 11px;
-  border: 1px solid #dbe3ef;
+  border: 1px solid var(--cw-editor-border);
   border-radius: 8px;
-  background: #fff;
-  color: #6b7280;
+  background: var(--cw-editor-bg);
+  color: var(--cw-editor-muted);
 }
 
 .content-widget-picker__search:focus-within {
-  border-color: #2563eb;
+  border-color: var(--cw-editor-accent);
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
@@ -349,7 +350,7 @@ onBeforeUnmount(() => window.removeEventListener('storage', handleStorage))
   min-width: 0;
   border: none;
   outline: none;
-  color: #111827;
+  color: var(--cw-editor-text);
   font: inherit;
 }
 
@@ -370,18 +371,16 @@ onBeforeUnmount(() => window.removeEventListener('storage', handleStorage))
   gap: 12px;
   min-height: 176px;
   padding: 10px;
-  border: 1px solid #e6edf5;
+  border: 1px solid var(--cw-editor-border);
   border-radius: 8px;
-  background: #fff;
-  color: #111827;
+  background: var(--cw-editor-bg);
+  color: var(--cw-editor-text);
   text-align: left;
 }
 
 .content-widget-picker__item:hover {
-  border-color: #93c5fd;
-  background: #fbfdff;
-  box-shadow: 0 8px 22px rgb(15 23 42 / 0.08);
-  transform: translateY(-1px);
+  border-color: var(--cw-editor-accent);
+  background: var(--cw-editor-panel);
 }
 
 .content-widget-picker__select {
@@ -414,20 +413,20 @@ onBeforeUnmount(() => window.removeEventListener('storage', handleStorage))
   border: 1px solid transparent;
   border-radius: 7px;
   background: transparent;
-  color: #94a3b8;
+  color: var(--cw-editor-muted);
   cursor: pointer;
 }
 
 .content-widget-picker__favorite:hover,
 .content-widget-picker__favorite:focus-visible {
-  border-color: #fecdd3;
+  border-color: var(--cw-editor-accent-soft);
   outline: none;
-  background: #fff1f2;
-  color: #e11d48;
+  background: var(--cw-editor-accent-soft);
+  color: var(--cw-editor-accent);
 }
 
 .content-widget-picker__favorite.is-favorite {
-  color: #e11d48;
+  color: var(--cw-editor-accent);
 }
 
 .content-widget-picker__favorite svg {
@@ -456,22 +455,22 @@ onBeforeUnmount(() => window.removeEventListener('storage', handleStorage))
   padding: 2px 7px;
   border-radius: 5px;
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 600;
   line-height: 1.4;
 }
 
 .content-widget-picker__kind--inline {
-  background: #eff6ff;
-  color: #2563eb;
+  background: var(--cw-editor-accent-soft);
+  color: var(--cw-editor-accent);
 }
 
 .content-widget-picker__kind--block {
-  background: #f3f4f6;
-  color: #4b5563;
+  background: var(--cw-editor-hover);
+  color: var(--cw-editor-text);
 }
 
 .content-widget-picker__item-desc {
-  color: #6b7280;
+  color: var(--cw-editor-muted);
   font-size: 13px;
   line-height: 1.4;
 }
@@ -482,18 +481,18 @@ onBeforeUnmount(() => window.removeEventListener('storage', handleStorage))
   max-height: 128px;
   overflow: hidden;
   padding: 10px;
-  border: 1px solid #eef3f8;
+  border: 1px solid var(--cw-editor-border);
   border-radius: 6px;
-  background: linear-gradient(180deg, #fff, #f8fafc);
+  background: var(--cw-editor-panel);
 }
 
 .content-widget-picker__empty {
   display: grid;
   place-items: center;
   min-height: 220px;
-  border: 1px dashed #d1d5db;
+  border: 1px dashed var(--cw-editor-border);
   border-radius: 8px;
-  color: #6b7280;
+  color: var(--cw-editor-muted);
   font-size: 13px;
 }
 
@@ -512,7 +511,7 @@ onBeforeUnmount(() => window.removeEventListener('storage', handleStorage))
     overflow-x: auto;
     padding: 10px 14px;
     border-right: none;
-    border-bottom: 1px solid #eef2f7;
+    border-bottom: 1px solid var(--cw-editor-border);
   }
 
   .content-widget-picker__sidebar button {

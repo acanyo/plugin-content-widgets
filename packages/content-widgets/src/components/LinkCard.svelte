@@ -53,8 +53,8 @@
 <a
   class={`xhhao-com-link-card xhhao-com-link-card-appearance-${resolvedAppearance}`}
   style:--xhhao-com-link-card-accent-source={safeColor(accentColor, config.accentColor)}
-  style:--xhhao-com-link-card-bg-source={safeColor(backgroundColor, config.backgroundColor)}
-  style:--xhhao-com-link-card-text-source={safeColor(textColor, config.textColor)}
+  style:--xhhao-com-link-card-bg-source={backgroundColor || resolvedAppearance === "custom" ? safeColor(backgroundColor, config.backgroundColor) : undefined}
+  style:--xhhao-com-link-card-text-source={textColor || resolvedAppearance === "custom" ? safeColor(textColor, config.textColor) : undefined}
   href={safeHref(href)}
   {target}
   {rel}

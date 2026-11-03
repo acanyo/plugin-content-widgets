@@ -96,5 +96,5 @@ export const actionButtonPresetMap = Object.fromEntries(
 ) as Record<ActionButtonPreset, ActionButtonPresetDefinition>;
 
 export function getActionButtonPreset(value?: string): ActionButtonPresetDefinition {
-  return actionButtonPresetMap[value as ActionButtonPreset] || actionButtonPresetMap["blue-gradient"];
+  return actionButtonPresetMap[value as ActionButtonPreset] || actionButtonPresetMap["blue-solid"];
 }

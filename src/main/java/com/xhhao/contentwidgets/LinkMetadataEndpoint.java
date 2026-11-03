@@ -391,6 +391,12 @@ public class LinkMetadataEndpoint implements CustomEndpoint {
     }
 
     static URI normalizeAndValidate(String rawUrl) {
+        var uri = normalizeUrl(rawUrl);
+        validatePublicHost(uri);
+        return uri;
+    }
+
+    static URI normalizeUrl(String rawUrl) {
         var value = rawUrl == null ? "" : rawUrl.trim();
         if (value.isBlank()) {
             throw new IllegalArgumentException("请先输入网站链接。");
@@ -422,7 +428,6 @@ public class LinkMetadataEndpoint implements CustomEndpoint {
         if (port != -1 && port != 80 && port != 443) {
             throw new IllegalArgumentException("只允许访问网站的 80 或 443 端口。");
         }
-        validatePublicHost(uri);
         return uri;
     }
 

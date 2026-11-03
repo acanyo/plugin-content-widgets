@@ -15,8 +15,8 @@
   let {
     href = "#",
     target = "_self",
-    shape = "pill",
-    preset = "blue-gradient",
+    shape = "square",
+    preset = "blue-solid",
     icon,
     iconName = "external-link",
     iconPosition = "after",

@@ -38,9 +38,9 @@ export const linkCardPresetDefinitions: LinkCardPresetDefinition[] = [
     title: "在 GitHub 上查看",
     description: "查看源码、Issue、发布版本与项目动态。",
     href: "https://github.com/",
-    accentColor: "#60a5fa",
-    backgroundColor: "#0f172a",
-    textColor: "#f8fafc",
+    accentColor: "#334155",
+    backgroundColor: "#f9fafb",
+    textColor: "#1f2937",
     icon: "code",
   },
   {

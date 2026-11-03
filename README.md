@@ -23,8 +23,17 @@
 - 提示：提示框、增强提示框、悬浮提示、引用、便签、结果
 - 布局：标签页、折叠面板、分栏、步骤、时间线、卡片列表、外链卡片、对比
 - 代码：复制命令、命令组、快捷键
-- 展示：聊天、图片、PDF 预览、进度条、状态、徽标、按钮、增强按钮、任务清单
+- 展示：聊天、图片、PDF 预览、哔哩哔哩视频、进度条、状态、徽标、按钮、增强按钮、任务清单
 - 行内：表情时钟、模糊文本、批注、阅读时间
+
+## MCP 工具
+
+插件可选依赖 MCP Server 插件（`>=1.2.0`）。安装并启用 MCP Server 插件后，本插件会自动向 AI 客户端暴露两个只读工具，让 AI 能够查询组件目录并生成可直接嵌入文章的组件 HTML：
+
+- `list_widgets`：分页列出所有组件，返回标签名、属性字段、选项和内容要求。支持按 `category`（分类）、`kind`（`block` 块级 / `inline` 行内）、`keyword`（关键词匹配 id、标题、描述和关键词）过滤，以及 `page`、`page_size`（最大 50）分页。
+- `render_widget`：根据组件 id（或标签名）和属性生成组件的 HTML 片段，AI 可将其原样插入文章内容，由插件在前台渲染。
+
+典型流程：AI 先调用 `list_widgets` 选择合适的组件，再调用 `render_widget` 生成 HTML 并嵌入文章。两个工具均需要已认证的用户身份才能调用。
 
 ## 作为标签使用
 
@@ -66,15 +75,15 @@
 
 ### xhhao-com-action-button
 
-独立的行内增强按钮，支持渐变、三档圆角和可隐藏图标。
+独立的行内增强按钮，默认使用纯色和小圆角，也可选择渐变、圆角与图标。
 
 ```html
 <xhhao-com-action-button
   href="https://example.com"
   target="_blank"
-  shape="pill"
-  gradient-start="#0ea5ff"
-  gradient-end="#1d3fd8"
+  shape="square"
+  preset="blue-solid"
+  appearance="auto"
   text-color="#ffffff"
   icon-name="external-link"
   icon-position="after"
@@ -191,16 +200,42 @@ PDF 预览，用于在文章中嵌入并预览 PDF 文件，支持从 Halo 附�
 - `width`：宽度，默认 `100%`。
 - `height`：高度，默认 `500px`。
 
-## 前台资源
+### xhhao-com-bilibili
 
-插件启用后会自动向前台页面注入独立资源：
+哔哩哔哩视频，用于在文章中嵌入 B 站视频播放器。
 
 ```html
-<script src="/plugins/content-widgets/assets/static/content-widgets.iife.js"></script>
-<link rel="stylesheet" href="/plugins/content-widgets/assets/static/content-widgets.css" />
+<xhhao-com-bilibili bvid="BV1xx411c7mD" title="视频标题" page="1"></xhhao-com-bilibili>
+```
+
+参数：
+
+- `bvid`：视频 BV 号，与 `aid` 二选一。
+- `aid`：视频 AV 号（纯数字，不含 `av` 前缀也可以）。
+- `title`：标题。
+- `page`：分 P 序号，默认 `1`。
+- `autoplay`：是否自动播放。
+- `width`：宽度，默认 `100%`。
+- `height`：高度，默认按 `16:9` 比例自适应。
+
+## 前台资源
+
+插件启用后会自动向前台页面注入一个轻量的加载器脚本：
+
+```html
+<script type="module" src="/plugins/content-widgets/assets/static/content-widgets-loader.js"></script>
 ```
 
 资源由插件自身构建和提供，不需要主题主动引入。
+
+### 按需加载
+
+每个组件的 JS 和 CSS 都独立分包，页面只加载实际用到的组件资源：
+
+- 页面没有使用任何组件时，只加载几 KB 的加载器，不会产生其他请求。
+- 页面包含 `xhhao-com-*` 标签时，加载器按需加载对应组件的 JS chunk 与 CSS，多个组件共享的运行时和基础样式只加载一次。
+- 组件按视口懒挂载：滚动到可视区域附近时才加载并初始化对应组件，首屏外的组件不会提前消耗资源。
+- 嵌套组件（如标签页内嵌复制命令）会先挂载内部组件，再挂载外部容器，保证渲染结果完整。
 
 ## PJAX 兼容
 

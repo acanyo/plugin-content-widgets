@@ -22,7 +22,11 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/content-widgets.js"
     },
-    "./content-widgets.css": "./dist/content-widgets.css"
+    "./content-widgets.css": "./dist/content-widgets.css",
+    "./presets": {
+      "types": "./dist/presets.d.ts",
+      "import": "./dist/widget-presets.js"
+    }
   },
   "main": "./dist/content-widgets.js",
   "module": "./dist/content-widgets.js",
@@ -31,7 +35,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "vite build --config vite.config.lib.ts && tsc -p tsconfig.build.json",
+    "build": "vite build --config vite.config.lib.ts && vite build --config vite.config.browser.ts && vite build --config vite.config.presets.ts && tsc -p tsconfig.build.json",
     "check": "svelte-check --tsconfig ./tsconfig.app.json && tsc -p tsconfig.node.json",
     "dev": "vite",
     "preview": "vite preview",

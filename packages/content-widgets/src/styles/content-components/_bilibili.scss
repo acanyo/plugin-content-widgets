@@ -1,0 +1,85 @@
+// ========================================
+// 哔哩哔哩视频
+// ========================================
+.xhhao-com-bilibili {
+  --xhhao-com-bilibili-radius: var(--xhhao-com-radius, 8px);
+  --xhhao-com-bilibili-border: var(--xhhao-com-border, #e5e7eb);
+  --xhhao-com-bilibili-bg: var(--xhhao-com-bg, #fff);
+  --xhhao-com-bilibili-header-bg: var(--xhhao-com-bg-2, #f9fafb);
+  --xhhao-com-bilibili-text: var(--xhhao-com-text, #374151);
+  --xhhao-com-bilibili-text-2: var(--xhhao-com-text-2, #9ca3af);
+  --xhhao-com-bilibili-brand: #fb7299;
+
+  border: 1px solid var(--xhhao-com-bilibili-border);
+  border-radius: var(--xhhao-com-bilibili-radius);
+  overflow: hidden;
+  background: var(--xhhao-com-bilibili-bg);
+
+  .xhhao-com-bilibili__header {
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+    padding: 0.5em 0.75em;
+    background: var(--xhhao-com-bilibili-header-bg);
+    border-bottom: 1px solid var(--xhhao-com-bilibili-border);
+  }
+
+  .xhhao-com-bilibili__icon {
+    width: 1.1em;
+    height: 1.1em;
+    flex-shrink: 0;
+    color: var(--xhhao-com-bilibili-brand);
+  }
+
+  .xhhao-com-bilibili__title {
+    flex: 1;
+    font-size: 0.875em;
+    font-weight: 500;
+    color: var(--xhhao-com-bilibili-text);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .xhhao-com-bilibili__link {
+    display: flex;
+    align-items: center;
+    color: var(--xhhao-com-bilibili-text-2);
+    transition: color 0.2s;
+
+    &:hover {
+      color: var(--xhhao-com-bilibili-brand);
+    }
+
+    svg {
+      width: 1.1em;
+      height: 1.1em;
+    }
+  }
+
+  .xhhao-com-bilibili__body {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    background: #000;
+
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: block;
+    }
+  }
+
+  .xhhao-com-bilibili__empty {
+    padding: 2em 1em;
+    font-size: 0.875em;
+    color: var(--xhhao-com-bilibili-text-2);
+    text-align: center;
+  }
+}
+
+// Dark mode
+.dark .xhhao-com-bilibili,
+[data-color-scheme="dark"] .xhhao-com-bilibili {
+  --xhhao-com-bilibili-header-bg: rgba(255, 255, 255, 0.05);
+}

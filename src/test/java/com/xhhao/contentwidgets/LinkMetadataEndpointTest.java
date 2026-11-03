@@ -25,7 +25,7 @@ public class LinkMetadataEndpointTest {
     void normalizesSharedUrlAndRejectsUnsafeTargets() {
         assertEquals(
             "https://github.com/acanyo/plugin-content-widgets",
-            LinkMetadataEndpoint.normalizeAndValidate(
+            LinkMetadataEndpoint.normalizeUrl(
                 "参考链接：https://github.com/acanyo/plugin-content-widgets。"
             ).toString()
         );

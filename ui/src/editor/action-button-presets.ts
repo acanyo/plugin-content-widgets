@@ -1,4 +1,4 @@
-import { getActionButtonPreset } from '@xhhao/content-widgets'
+import { getActionButtonPreset } from '@xhhao/content-widgets/presets'
 
 export function applyActionButtonPreset(
   attributes: Record<string, string>,

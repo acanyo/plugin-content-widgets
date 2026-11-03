@@ -30,7 +30,9 @@ const emit = defineEmits<{
 }>()
 
 const attachmentSelectorVisible = ref(false)
-const activeAttachmentField = ref<ContentWidgetEditorField | ContentWidgetEditorListItemField | null>(null)
+const activeAttachmentField = ref<
+  ContentWidgetEditorField | ContentWidgetEditorListItemField | null
+>(null)
 const activeAttachmentItemIndex = ref<number | null>(null)
 const metadataLoading = ref(false)
 const metadataMessage = ref('')
@@ -114,11 +116,12 @@ async function fetchMetadata(force = false) {
 
     emit('update', applyContentWidgetMetadata(props.widget, props.field, metadata, href))
 
-    metadataMessage.value = metadata.source === 'fallback'
-      ? '目标网站限制了自动读取，已填入平台默认信息；你仍可手工修改。'
-      : metadata.imageUrl
-        ? '已读取标题、说明、网站图标和预览图。'
-        : '已读取标题、说明和网站图标。'
+    metadataMessage.value =
+      metadata.source === 'fallback'
+        ? '目标网站限制了自动读取，已填入平台默认信息；你仍可手工修改。'
+        : metadata.imageUrl
+          ? '已读取标题、说明、网站图标和预览图。'
+          : '已读取标题、说明和网站图标。'
   } catch (error) {
     if (requestId !== metadataRequestId) return
     if (error instanceof Error && error.name === 'AbortError') return
@@ -196,7 +199,10 @@ function openItemAttachmentSelector(index: number, field: ContentWidgetEditorLis
   attachmentSelectorVisible.value = true
 }
 
-function itemFieldValue(item: ContentWidgetEditorListItemValue, field: ContentWidgetEditorListItemField) {
+function itemFieldValue(
+  item: ContentWidgetEditorListItemValue,
+  field: ContentWidgetEditorListItemField,
+) {
   if (field.source === 'content') {
     return item.content
   }
@@ -350,6 +356,7 @@ function moveItem(index: number, offset: number) {
           :title="option.label"
           :aria-label="option.label"
           :aria-selected="primitiveTextValue() === option.value"
+          role="option"
           @click="selectPrimitiveValue(option.value)"
         >
           <span v-if="option.value === 'none'">无图标</span>
@@ -395,7 +402,11 @@ function moveItem(index: number, offset: number) {
           :placeholder="field.placeholder"
           @input="handlePrimitiveInput"
         />
-        <button type="button" class="content-widget-editor-field__attachment-btn" @click="openAttachmentSelector">
+        <button
+          type="button"
+          class="content-widget-editor-field__attachment-btn"
+          @click="openAttachmentSelector"
+        >
           选择
         </button>
       </component>
@@ -431,7 +442,10 @@ function moveItem(index: number, offset: number) {
         @input="handlePrimitiveInput"
       />
 
-      <p v-if="field.metadata && metadataMessage" class="content-widget-editor-field__metadata-message">
+      <p
+        v-if="field.metadata && metadataMessage"
+        class="content-widget-editor-field__metadata-message"
+      >
         {{ metadataMessage }}
       </p>
     </component>
@@ -474,7 +488,9 @@ function moveItem(index: number, offset: number) {
             <button type="button" title="复制" aria-label="复制" @click="duplicateItem(index)">
               +
             </button>
-            <button type="button" title="删除" aria-label="删除" @click="removeItem(index)">×</button>
+            <button type="button" title="删除" aria-label="删除" @click="removeItem(index)">
+              ×
+            </button>
           </span>
         </component>
 
@@ -573,7 +589,7 @@ function moveItem(index: number, offset: number) {
 .content-widget-editor-field__label {
   display: grid;
   gap: 5px;
-  color: #374151;
+  color: var(--cw-editor-text);
   font-size: 12px;
   font-weight: 600;
   line-height: 1.4;
@@ -609,7 +625,7 @@ function moveItem(index: number, offset: number) {
 
 .content-widget-editor-field__metadata-message {
   margin: 0;
-  color: #64748b;
+  color: var(--cw-editor-muted);
   font-size: 11px;
   font-weight: 400;
   line-height: 1.45;
@@ -626,9 +642,9 @@ function moveItem(index: number, offset: number) {
   width: 42px;
   height: 32px;
   padding: 3px;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--cw-editor-border);
   border-radius: 6px;
-  background: #fff;
+  background: var(--cw-editor-bg);
   cursor: pointer;
 }
 
@@ -641,7 +657,7 @@ function moveItem(index: number, offset: number) {
 .content-widget-editor-field__icons button {
   height: 34px;
   padding: 0;
-  background: #f8fafc;
+  background: var(--cw-editor-panel);
 }
 
 .content-widget-editor-field__icons button[aria-label='不显示'] {
@@ -650,9 +666,9 @@ function moveItem(index: number, offset: number) {
 }
 
 .content-widget-editor-field__icons button.is-active {
-  border-color: #2563eb;
-  background: #eff6ff;
-  color: #2563eb;
+  border-color: var(--cw-editor-accent);
+  background: var(--cw-editor-accent-soft);
+  color: var(--cw-editor-accent);
   box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
 }
 
@@ -666,17 +682,17 @@ function moveItem(index: number, offset: number) {
   min-width: 0;
   height: 32px;
   padding: 0 9px;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--cw-editor-border);
   border-radius: 6px;
-  background: #fff;
-  color: #111827;
+  background: var(--cw-editor-bg);
+  color: var(--cw-editor-text);
   font: inherit;
   font-weight: 400;
   outline: none;
 }
 
 .content-widget-editor-field__attachment input:focus {
-  border-color: #2563eb;
+  border-color: var(--cw-editor-accent);
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
 }
 
@@ -684,10 +700,10 @@ function moveItem(index: number, offset: number) {
   flex-shrink: 0;
   height: 32px;
   padding: 0 12px;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--cw-editor-border);
   border-radius: 6px;
-  background: #fff;
-  color: #374151;
+  background: var(--cw-editor-bg);
+  color: var(--cw-editor-text);
   cursor: pointer;
   font: inherit;
   font-size: 12px;
@@ -697,9 +713,9 @@ function moveItem(index: number, offset: number) {
 }
 
 .content-widget-editor-field__attachment-btn:hover {
-  border-color: #2563eb;
-  background: #eff6ff;
-  color: #2563eb;
+  border-color: var(--cw-editor-accent);
+  background: var(--cw-editor-accent-soft);
+  color: var(--cw-editor-accent);
 }
 
 .content-widget-editor-field__check {
@@ -723,14 +739,14 @@ function moveItem(index: number, offset: number) {
   width: 14px;
   height: 14px;
   border-radius: 999px;
-  background: #fff;
+  background: var(--cw-editor-bg);
   box-shadow: 0 1px 2px rgb(15 23 42 / 0.2);
   content: '';
   transition: transform 0.16s ease;
 }
 
 .content-widget-editor-field__check:checked {
-  background: #2563eb;
+  background: var(--cw-editor-accent);
 }
 
 .content-widget-editor-field__check:checked::before {
@@ -742,10 +758,10 @@ function moveItem(index: number, offset: number) {
 .content-widget-editor-field select {
   width: 100%;
   min-width: 0;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--cw-editor-border);
   border-radius: 6px;
-  background: #fff;
-  color: #111827;
+  background: var(--cw-editor-bg);
+  color: var(--cw-editor-text);
   font: inherit;
   font-weight: 400;
   outline: none;
@@ -753,7 +769,7 @@ function moveItem(index: number, offset: number) {
 
 .content-widget-editor-field input[type='text'],
 .content-widget-editor-field textarea {
-  caret-color: #2563eb;
+  caret-color: var(--cw-editor-accent);
   cursor: text;
   pointer-events: auto;
   user-select: text;
@@ -778,7 +794,7 @@ function moveItem(index: number, offset: number) {
 .content-widget-editor-field input:focus,
 .content-widget-editor-field textarea:focus,
 .content-widget-editor-field select:focus {
-  border-color: #2563eb;
+  border-color: var(--cw-editor-accent);
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
 }
 
@@ -796,21 +812,21 @@ function moveItem(index: number, offset: number) {
 }
 
 .content-widget-editor-list__head {
-  color: #111827;
+  color: var(--cw-editor-text);
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .content-widget-editor-list__item {
   gap: 9px;
   padding: 10px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--cw-editor-border);
   border-radius: 7px;
-  background: #fff;
+  background: var(--cw-editor-bg);
 }
 
 .content-widget-editor-list__item-head strong {
-  color: #111827;
+  color: var(--cw-editor-text);
   font-size: 12px;
   line-height: 1.4;
 }
@@ -826,10 +842,10 @@ function moveItem(index: number, offset: number) {
   min-width: 26px;
   height: 26px;
   padding: 0 7px;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--cw-editor-border);
   border-radius: 6px;
-  background: #fff;
-  color: #374151;
+  background: var(--cw-editor-bg);
+  color: var(--cw-editor-text);
   cursor: pointer;
   font: inherit;
   font-size: 12px;
@@ -837,9 +853,9 @@ function moveItem(index: number, offset: number) {
 }
 
 .content-widget-editor-field button:hover:not(:disabled) {
-  border-color: #2563eb;
-  background: #eff6ff;
-  color: #2563eb;
+  border-color: var(--cw-editor-accent);
+  background: var(--cw-editor-accent-soft);
+  color: var(--cw-editor-accent);
 }
 
 .content-widget-editor-field button:disabled {
