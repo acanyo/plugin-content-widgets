@@ -32,6 +32,8 @@ export type ContentWidgetEditorFieldType =
   | 'select'
   | 'checkbox'
   | 'attachment'
+  | 'color'
+  | 'icon'
   | 'list'
 export type ContentWidgetEditorFieldSource = 'attribute' | 'innerHTML' | 'children'
 export type ContentWidgetEditorListItemFieldSource = 'attribute' | 'content'
@@ -39,7 +41,15 @@ export type ContentWidgetEditorListItemFieldSource = 'attribute' | 'content'
 export interface ContentWidgetEditorFieldOption {
   label: string
   value: string
+  icon?: string
 }
+
+export interface ContentWidgetEditorMetadataConfig {
+  autoField?: string
+  buttonLabel?: string
+}
+
+export type ContentWidgetEditorMetadataRole = 'url' | 'manual'
 
 export interface ContentWidgetEditorListItemField {
   name: string
@@ -66,6 +76,9 @@ export interface ContentWidgetEditorField {
   placeholder?: string
   options?: ContentWidgetEditorFieldOption[]
   accepts?: string[]
+  layout?: 'full' | 'half'
+  metadata?: ContentWidgetEditorMetadataConfig
+  metadataRole?: ContentWidgetEditorMetadataRole
   childTagName?: string
   wrapperTagName?: string
   addLabel?: string

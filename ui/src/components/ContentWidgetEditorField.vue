@@ -1,9 +1,8 @@
 <script lang="ts" setup>
-import { ref } from 'vue'
+import { onBeforeUnmount, ref, watch } from 'vue'
 import {
   createDefaultListItem,
   getContentWidgetFieldValue,
-  setContentWidgetFieldValue,
 } from '@/editor/content-widget-field-values'
 import type {
   ContentWidgetEditorField,
@@ -12,6 +11,11 @@ import type {
   ContentWidgetEditorFieldValue,
   ContentWidgetNodeAttrs,
 } from '@/editor/content-widget-types'
+import {
+  applyContentWidgetFieldValue,
+  applyContentWidgetMetadata,
+} from '@/editor/content-widget-field-handlers'
+import { readLinkMetadata } from '@/editor/link-metadata'
 import { type AttachmentLike } from '@halo-dev/ui-shared'
 
 const props = defineProps<{
@@ -22,14 +26,39 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   update: [widget: ContentWidgetNodeAttrs]
+  'overlay-change': [visible: boolean]
 }>()
 
 const attachmentSelectorVisible = ref(false)
-const activeAttachmentField = ref<ContentWidgetEditorField | ContentWidgetEditorListItemField | null>(null)
+const activeAttachmentField = ref<
+  ContentWidgetEditorField | ContentWidgetEditorListItemField | null
+>(null)
 const activeAttachmentItemIndex = ref<number | null>(null)
+const metadataLoading = ref(false)
+const metadataMessage = ref('')
+let metadataRequestId = 0
+let metadataAbortController: AbortController | undefined
+let metadataActiveHref = ''
+
+watch(attachmentSelectorVisible, (visible) => emit('overlay-change', visible))
+
+onBeforeUnmount(() => {
+  metadataRequestId += 1
+  metadataAbortController?.abort()
+  if (attachmentSelectorVisible.value) emit('overlay-change', false)
+})
 
 function emitFieldValue(value: ContentWidgetEditorFieldValue) {
-  emit('update', setContentWidgetFieldValue(props.widget, props.field, value))
+  if (props.field.metadataRole) {
+    metadataRequestId += 1
+    metadataAbortController?.abort()
+    metadataAbortController = undefined
+    metadataActiveHref = ''
+    metadataLoading.value = false
+    metadataMessage.value = ''
+  }
+
+  emit('update', applyContentWidgetFieldValue(props.widget, props.field, value))
 }
 
 function primitiveValue() {
@@ -44,6 +73,66 @@ function primitiveTextValue() {
 
 function primitiveCheckedValue() {
   return Boolean(primitiveValue())
+}
+
+function primitiveColorValue() {
+  const value = primitiveTextValue()
+  return /^#[\da-f]{6}$/i.test(value) ? value : '#000000'
+}
+
+function selectPrimitiveValue(value: string) {
+  emitFieldValue(value)
+}
+
+function metadataAutoEnabled() {
+  const autoFieldName = props.field.metadata?.autoField
+  if (!autoFieldName) return false
+  const value = props.widget.attributes?.[autoFieldName]
+  return value === '' || value === 'true'
+}
+
+async function fetchMetadata(force = false) {
+  if (!props.field.metadata || (!force && !metadataAutoEnabled())) return
+
+  const href = primitiveTextValue().trim()
+  if (!href || href === '#') return
+
+  if (metadataLoading.value && metadataActiveHref === href) return
+
+  metadataAbortController?.abort()
+  const abortController = new AbortController()
+  metadataAbortController = abortController
+  metadataActiveHref = href
+
+  const requestId = ++metadataRequestId
+  metadataLoading.value = true
+  metadataMessage.value = '正在读取网站信息…'
+
+  try {
+    const metadata = await readLinkMetadata(href, abortController.signal)
+    if (requestId !== metadataRequestId) return
+    if (!force && !metadataAutoEnabled()) return
+    if (primitiveTextValue().trim() !== href) return
+
+    emit('update', applyContentWidgetMetadata(props.widget, props.field, metadata, href))
+
+    metadataMessage.value =
+      metadata.source === 'fallback'
+        ? '目标网站限制了自动读取，已填入平台默认信息；你仍可手工修改。'
+        : metadata.imageUrl
+          ? '已读取标题、说明、网站图标和预览图。'
+          : '已读取标题、说明和网站图标。'
+  } catch (error) {
+    if (requestId !== metadataRequestId) return
+    if (error instanceof Error && error.name === 'AbortError') return
+    metadataMessage.value = error instanceof Error ? error.message : '无法读取该网站信息。'
+  } finally {
+    if (requestId === metadataRequestId) {
+      metadataLoading.value = false
+      metadataActiveHref = ''
+      if (metadataAbortController === abortController) metadataAbortController = undefined
+    }
+  }
 }
 
 function listValue() {
@@ -79,7 +168,11 @@ function onAttachmentSelect(attachments: AttachmentLike[]) {
   if (typeof attachment === 'string') {
     url = attachment
   } else {
-    url = (attachment as any).status?.permalink || (attachment as any).url || ''
+    const attachmentValue = attachment as {
+      status?: { permalink?: string }
+      url?: string
+    }
+    url = attachmentValue.status?.permalink || attachmentValue.url || ''
   }
 
   if (activeAttachmentItemIndex.value !== null && activeAttachmentField.value) {
@@ -106,7 +199,10 @@ function openItemAttachmentSelector(index: number, field: ContentWidgetEditorLis
   attachmentSelectorVisible.value = true
 }
 
-function itemFieldValue(item: ContentWidgetEditorListItemValue, field: ContentWidgetEditorListItemField) {
+function itemFieldValue(
+  item: ContentWidgetEditorListItemValue,
+  field: ContentWidgetEditorListItemField,
+) {
   if (field.source === 'content') {
     return item.content
   }
@@ -213,7 +309,8 @@ function moveItem(index: number, offset: number) {
     class="content-widget-editor-field"
     :class="{ 'content-widget-editor-field--inline': inline }"
   >
-    <label
+    <component
+      :is="field.type === 'icon' ? 'div' : 'label'"
       v-if="field.type !== 'list'"
       class="content-widget-editor-field__label"
       :class="{ 'content-widget-editor-field__label--check': field.type === 'checkbox' }"
@@ -229,6 +326,54 @@ function moveItem(index: number, offset: number) {
           {{ option.label }}
         </option>
       </select>
+
+      <span v-else-if="field.type === 'color'" class="content-widget-editor-field__color">
+        <input
+          type="color"
+          :value="primitiveColorValue()"
+          :aria-label="field.label"
+          @input="handlePrimitiveInput"
+        />
+        <input
+          type="text"
+          :value="primitiveTextValue()"
+          :placeholder="field.placeholder"
+          @input="handlePrimitiveInput"
+        />
+      </span>
+
+      <span
+        v-else-if="field.type === 'icon'"
+        class="content-widget-editor-field__icons"
+        role="listbox"
+        :aria-label="field.label"
+      >
+        <button
+          v-for="option in field.options || []"
+          :key="option.value"
+          type="button"
+          :class="{ 'is-active': primitiveTextValue() === option.value }"
+          :title="option.label"
+          :aria-label="option.label"
+          :aria-selected="primitiveTextValue() === option.value"
+          role="option"
+          @click="selectPrimitiveValue(option.value)"
+        >
+          <span v-if="option.value === 'none'">无图标</span>
+          <svg
+            v-else-if="option.icon"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+            v-html="option.icon"
+          />
+          <span v-else>{{ option.label }}</span>
+        </button>
+      </span>
 
       <textarea
         v-else-if="field.type === 'textarea'"
@@ -257,8 +402,35 @@ function moveItem(index: number, offset: number) {
           :placeholder="field.placeholder"
           @input="handlePrimitiveInput"
         />
-        <button type="button" class="content-widget-editor-field__attachment-btn" @click="openAttachmentSelector">
+        <button
+          type="button"
+          class="content-widget-editor-field__attachment-btn"
+          @click="openAttachmentSelector"
+        >
           选择
+        </button>
+      </component>
+
+      <component
+        :is="inline ? 'span' : 'div'"
+        v-else-if="field.metadata"
+        class="content-widget-editor-field__metadata"
+      >
+        <input
+          type="text"
+          :value="primitiveTextValue()"
+          :placeholder="field.placeholder"
+          @input="handlePrimitiveInput"
+          @blur="fetchMetadata()"
+        />
+        <button
+          type="button"
+          class="content-widget-editor-field__metadata-btn"
+          :disabled="metadataLoading"
+          @pointerdown.prevent
+          @click.stop.prevent="fetchMetadata(true)"
+        >
+          {{ metadataLoading ? '读取中…' : field.metadata.buttonLabel || '读取网站信息' }}
         </button>
       </component>
 
@@ -269,7 +441,14 @@ function moveItem(index: number, offset: number) {
         :placeholder="field.placeholder"
         @input="handlePrimitiveInput"
       />
-    </label>
+
+      <p
+        v-if="field.metadata && metadataMessage"
+        class="content-widget-editor-field__metadata-message"
+      >
+        {{ metadataMessage }}
+      </p>
+    </component>
 
     <component :is="inline ? 'span' : 'div'" v-else class="content-widget-editor-list">
       <component :is="inline ? 'span' : 'div'" class="content-widget-editor-list__head">
@@ -309,7 +488,9 @@ function moveItem(index: number, offset: number) {
             <button type="button" title="复制" aria-label="复制" @click="duplicateItem(index)">
               +
             </button>
-            <button type="button" title="删除" aria-label="删除" @click="removeItem(index)">×</button>
+            <button type="button" title="删除" aria-label="删除" @click="removeItem(index)">
+              ×
+            </button>
           </span>
         </component>
 
@@ -402,14 +583,13 @@ function moveItem(index: number, offset: number) {
 }
 
 .content-widget-editor-field--inline {
-  display: inline-grid;
-  width: min(340px, calc(100vw - 48px));
+  width: 100%;
 }
 
 .content-widget-editor-field__label {
   display: grid;
   gap: 5px;
-  color: #374151;
+  color: var(--cw-editor-text);
   font-size: 12px;
   font-weight: 600;
   line-height: 1.4;
@@ -426,22 +606,93 @@ function moveItem(index: number, offset: number) {
   align-items: center;
 }
 
+.content-widget-editor-field__metadata {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.content-widget-editor-field__metadata input {
+  flex: 1;
+  min-width: 0;
+}
+
+.content-widget-editor-field__metadata-btn {
+  flex-shrink: 0;
+  min-width: 92px;
+  white-space: nowrap;
+}
+
+.content-widget-editor-field__metadata-message {
+  margin: 0;
+  color: var(--cw-editor-muted);
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 1.45;
+}
+
+.content-widget-editor-field__color {
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr);
+  gap: 7px;
+  align-items: center;
+}
+
+.content-widget-editor-field__color input[type='color'] {
+  width: 42px;
+  height: 32px;
+  padding: 3px;
+  border: 1px solid var(--cw-editor-border);
+  border-radius: 6px;
+  background: var(--cw-editor-bg);
+  cursor: pointer;
+}
+
+.content-widget-editor-field__icons {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(34px, 1fr));
+  gap: 5px;
+}
+
+.content-widget-editor-field__icons button {
+  height: 34px;
+  padding: 0;
+  background: var(--cw-editor-panel);
+}
+
+.content-widget-editor-field__icons button[aria-label='不显示'] {
+  grid-column: span 2;
+  padding-inline: 8px;
+}
+
+.content-widget-editor-field__icons button.is-active {
+  border-color: var(--cw-editor-accent);
+  background: var(--cw-editor-accent-soft);
+  color: var(--cw-editor-accent);
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+}
+
+.content-widget-editor-field__icons svg {
+  width: 18px;
+  height: 18px;
+}
+
 .content-widget-editor-field__attachment input {
   flex: 1;
   min-width: 0;
   height: 32px;
   padding: 0 9px;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--cw-editor-border);
   border-radius: 6px;
-  background: #fff;
-  color: #111827;
+  background: var(--cw-editor-bg);
+  color: var(--cw-editor-text);
   font: inherit;
   font-weight: 400;
   outline: none;
 }
 
 .content-widget-editor-field__attachment input:focus {
-  border-color: #2563eb;
+  border-color: var(--cw-editor-accent);
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
 }
 
@@ -449,10 +700,10 @@ function moveItem(index: number, offset: number) {
   flex-shrink: 0;
   height: 32px;
   padding: 0 12px;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--cw-editor-border);
   border-radius: 6px;
-  background: #fff;
-  color: #374151;
+  background: var(--cw-editor-bg);
+  color: var(--cw-editor-text);
   cursor: pointer;
   font: inherit;
   font-size: 12px;
@@ -462,9 +713,9 @@ function moveItem(index: number, offset: number) {
 }
 
 .content-widget-editor-field__attachment-btn:hover {
-  border-color: #2563eb;
-  background: #eff6ff;
-  color: #2563eb;
+  border-color: var(--cw-editor-accent);
+  background: var(--cw-editor-accent-soft);
+  color: var(--cw-editor-accent);
 }
 
 .content-widget-editor-field__check {
@@ -488,14 +739,14 @@ function moveItem(index: number, offset: number) {
   width: 14px;
   height: 14px;
   border-radius: 999px;
-  background: #fff;
+  background: var(--cw-editor-bg);
   box-shadow: 0 1px 2px rgb(15 23 42 / 0.2);
   content: '';
   transition: transform 0.16s ease;
 }
 
 .content-widget-editor-field__check:checked {
-  background: #2563eb;
+  background: var(--cw-editor-accent);
 }
 
 .content-widget-editor-field__check:checked::before {
@@ -507,13 +758,25 @@ function moveItem(index: number, offset: number) {
 .content-widget-editor-field select {
   width: 100%;
   min-width: 0;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--cw-editor-border);
   border-radius: 6px;
-  background: #fff;
-  color: #111827;
+  background: var(--cw-editor-bg);
+  color: var(--cw-editor-text);
   font: inherit;
   font-weight: 400;
   outline: none;
+}
+
+.content-widget-editor-field input[type='text'],
+.content-widget-editor-field textarea {
+  caret-color: var(--cw-editor-accent);
+  cursor: text;
+  pointer-events: auto;
+  user-select: text;
+}
+
+.content-widget-editor-field select {
+  cursor: pointer;
 }
 
 .content-widget-editor-field input[type='text'],
@@ -531,7 +794,7 @@ function moveItem(index: number, offset: number) {
 .content-widget-editor-field input:focus,
 .content-widget-editor-field textarea:focus,
 .content-widget-editor-field select:focus {
-  border-color: #2563eb;
+  border-color: var(--cw-editor-accent);
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
 }
 
@@ -549,21 +812,21 @@ function moveItem(index: number, offset: number) {
 }
 
 .content-widget-editor-list__head {
-  color: #111827;
+  color: var(--cw-editor-text);
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .content-widget-editor-list__item {
   gap: 9px;
   padding: 10px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--cw-editor-border);
   border-radius: 7px;
-  background: #fff;
+  background: var(--cw-editor-bg);
 }
 
 .content-widget-editor-list__item-head strong {
-  color: #111827;
+  color: var(--cw-editor-text);
   font-size: 12px;
   line-height: 1.4;
 }
@@ -579,10 +842,10 @@ function moveItem(index: number, offset: number) {
   min-width: 26px;
   height: 26px;
   padding: 0 7px;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--cw-editor-border);
   border-radius: 6px;
-  background: #fff;
-  color: #374151;
+  background: var(--cw-editor-bg);
+  color: var(--cw-editor-text);
   cursor: pointer;
   font: inherit;
   font-size: 12px;
@@ -590,9 +853,9 @@ function moveItem(index: number, offset: number) {
 }
 
 .content-widget-editor-field button:hover:not(:disabled) {
-  border-color: #2563eb;
-  background: #eff6ff;
-  color: #2563eb;
+  border-color: var(--cw-editor-accent);
+  background: var(--cw-editor-accent-soft);
+  color: var(--cw-editor-accent);
 }
 
 .content-widget-editor-field button:disabled {

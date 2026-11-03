@@ -6,11 +6,25 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 
 class WidgetManifestLoaderTest {
 
     private final WidgetManifestLoader loader = new WidgetManifestLoader();
+
+    @Test
+    void shouldLoadGeneratedEditorDefinitionsForAllAdditions() {
+        var manifest = loader.load();
+        var ids = manifest.widgets().stream().map(WidgetManifest.Widget::id).toList();
+        assertTrue(ids.containsAll(List.of("bilibili", "action-button", "admonition", "link-card")));
+
+        var widget = new WidgetResolver(manifest).resolve("xhhao-com-action-button");
+        var html = WidgetHtmlRenderer.render(widget, java.util.Map.of());
+        assertTrue(html.startsWith("<xhhao-com-action-button "));
+        assertTrue(html.contains("前往访问"));
+        assertTrue(widget.fields().stream().anyMatch(field -> "icon".equals(field.type())));
+    }
 
     @Test
     void shouldReadManifestWithNestedFields() throws Exception {

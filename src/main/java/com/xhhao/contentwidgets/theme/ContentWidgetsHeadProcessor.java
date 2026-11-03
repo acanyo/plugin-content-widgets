@@ -21,7 +21,7 @@ public class ContentWidgetsHeadProcessor implements TemplateHeadProcessor {
 
     // 与 packages/content-widgets/src/loader/registry.ts 中的标签保持一致
     static final String WIDGET_TAGS =
-        "xhhao-com-alert,xhhao-com-badge,xhhao-com-button,xhhao-com-tab,xhhao-com-copy,"
+        "xhhao-com-action-button,xhhao-com-admonition,xhhao-com-link-card,xhhao-com-alert,xhhao-com-badge,xhhao-com-button,xhhao-com-tab,xhhao-com-copy,"
             + "xhhao-com-folding,xhhao-com-tip,xhhao-com-blur,xhhao-com-timeline,xhhao-com-quote,"
             + "xhhao-com-chat,xhhao-com-task-list,xhhao-com-key,xhhao-com-card-list,xhhao-com-pdf,"
             + "xhhao-com-bilibili,xhhao-com-pic,xhhao-com-progress,xhhao-com-emoji-clock,"

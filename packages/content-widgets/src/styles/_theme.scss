@@ -1,0 +1,13 @@
+@mixin when-dark {
+  :where(.dark, .color-scheme-dark, [data-color-scheme="dark"], [data-theme="dark"]) & {
+    @content;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not(.dark):not(.color-scheme-dark):not([data-theme]):not([data-color-scheme])
+      body:not(.dark):not(.color-scheme-dark):not([data-theme]):not([data-color-scheme])
+      & {
+      @content;
+    }
+  }
+}

@@ -1,3 +1,6 @@
+import actionButton from './action-button.widget'
+import linkCard from './link-card.widget'
+import admonition from './admonition.widget'
 import type { ContentWidgetModule } from '../content-widget-types'
 import alert from './alert.widget'
 import annotation from './annotation.widget'
@@ -31,6 +34,9 @@ import tip from './tip.widget'
 // 新增组件：创建 xxx.widget.ts 并在此登记即可。
 export const widgetModules: ContentWidgetModule[] = [
   alert,
+  actionButton,
+  linkCard,
+  admonition,
   tip,
   quote,
   note,

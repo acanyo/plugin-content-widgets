@@ -1,0 +1,167 @@
+@use "../theme";
+
+.xhhao-com-admonition {
+  --xhhao-com-admonition-accent: var(--xhhao-com-admonition-accent-source, #0ea5e9);
+  --xhhao-com-admonition-bg: var(--xhhao-com-admonition-bg-source, #f0f9ff);
+  --xhhao-com-admonition-text: var(--xhhao-com-admonition-text-source, #0c4a6e);
+
+  box-sizing: border-box;
+  margin: 1em 0;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--xhhao-com-admonition-accent) 34%, transparent);
+  border-radius: 0.5em;
+  background: var(--xhhao-com-admonition-bg);
+  color: var(--xhhao-com-admonition-text);
+  font-size: 0.94em;
+
+  details {
+    display: block !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    color: inherit !important;
+  }
+
+  .xhhao-com-admonition-title {
+    display: flex !important;
+    align-items: center;
+    gap: 0.55em;
+    min-height: 2.8em;
+    margin: 0 !important;
+    padding: 0.65em 0.9em !important;
+    border: 0 !important;
+    background: transparent !important;
+    color: var(--xhhao-com-admonition-accent) !important;
+    line-height: 1.4;
+
+    strong {
+      display: inline !important;
+      margin: 0 !important;
+      color: inherit !important;
+      font: inherit;
+      font-weight: 600;
+    }
+  }
+
+  summary.xhhao-com-admonition-title {
+    cursor: pointer;
+    list-style: none;
+
+    &::-webkit-details-marker {
+      display: none;
+    }
+  }
+
+  .xhhao-com-admonition-icon {
+    display: grid;
+    place-items: center;
+    flex: 0 0 auto;
+    width: 1.15em;
+    height: 1.15em;
+
+    svg,
+    img {
+      display: block;
+      width: 1.15em;
+      height: 1.15em;
+      object-fit: contain;
+    }
+  }
+
+  .xhhao-com-admonition-chevron {
+    margin-inline-start: auto;
+    font-size: 1.25em;
+    transition: transform 0.18s ease;
+  }
+
+  details[open] .xhhao-com-admonition-chevron {
+    transform: rotate(180deg);
+  }
+
+  .xhhao-com-admonition-body {
+    margin: 0 !important;
+    padding: 0.85em 1em !important;
+    background: var(--xhhao-com-admonition-bg) !important;
+    color: var(--xhhao-com-admonition-text) !important;
+    line-height: 1.72;
+
+    :where(h1, h2, h3, h4, h5, h6, p, ul, ol, li, blockquote, strong, em, del) {
+      color: inherit !important;
+    }
+
+    :where(h1, h2, h3, h4, h5, h6, p, ul, ol, blockquote) {
+      background: transparent !important;
+    }
+
+    :where(h1, h2, h3, h4, h5, h6) {
+      border: 0 !important;
+      text-shadow: none !important;
+    }
+
+    a {
+      color: var(--xhhao-com-admonition-accent) !important;
+    }
+
+    code {
+      padding: 0.12em 0.35em;
+      border-radius: 0.3em;
+      background: color-mix(in srgb, var(--xhhao-com-admonition-accent) 12%, transparent);
+      color: inherit;
+    }
+
+    pre {
+      overflow-x: auto;
+      padding: 0.75em;
+      border-radius: 0.5em;
+      background: color-mix(in srgb, var(--xhhao-com-admonition-text) 9%, var(--xhhao-com-admonition-bg));
+
+      code {
+        padding: 0;
+        background: transparent;
+      }
+    }
+
+    > :first-child {
+      margin-top: 0;
+    }
+
+    > :last-child {
+      margin-bottom: 0;
+    }
+  }
+}
+
+@mixin xhhao-com-admonition-dark-surface {
+  --xhhao-com-admonition-accent: color-mix(
+    in srgb,
+    var(--xhhao-com-admonition-accent-source, #0ea5e9) 74%,
+    #fff
+  );
+  --xhhao-com-admonition-bg: color-mix(
+    in srgb,
+    var(--xhhao-com-admonition-accent-source, #0ea5e9) 11%,
+    #18181b
+  );
+  --xhhao-com-admonition-text: #e5e7eb;
+}
+
+.xhhao-com-admonition-appearance-dark {
+  @include xhhao-com-admonition-dark-surface;
+}
+
+.xhhao-com-admonition-appearance-auto {
+  @include theme.when-dark {
+    @include xhhao-com-admonition-dark-surface;
+  }
+}
+
+.xhhao-com-admonition summary:focus-visible {
+  outline: 2px solid var(--xhhao-com-admonition-accent);
+  outline-offset: -2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .xhhao-com-admonition .xhhao-com-admonition-chevron { transition: none; }
+}

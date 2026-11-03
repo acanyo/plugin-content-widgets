@@ -4,6 +4,9 @@ import type { WidgetModule } from "../widgets/types";
 // 嵌套挂载时按此顺序优先挂载内部组件。
 // 新增组件时需要同步维护此表。
 export const widgetLoaders: Record<string, () => Promise<WidgetModule>> = {
+  "xhhao-com-admonition": () => import("../widgets/admonition"),
+  "xhhao-com-link-card": () => import("../widgets/link-card"),
+  "xhhao-com-action-button": () => import("../widgets/action-button"),
   "xhhao-com-alert": () => import("../widgets/alert"),
   "xhhao-com-badge": () => import("../widgets/badge"),
   "xhhao-com-button": () => import("../widgets/button"),

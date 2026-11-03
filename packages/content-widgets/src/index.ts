@@ -1,6 +1,28 @@
 import { mountCustomElements } from "./mount/mountCustomElements";
 
 export { mountCustomElements };
+export {
+  contentWidgetIconDefinitions,
+  contentWidgetIcons,
+} from "./components/icons/contentWidgetIcons";
+export {
+  actionButtonPresetDefinitions,
+  actionButtonPresetMap,
+  getActionButtonPreset,
+} from "./components/actionButtonPresets";
+export type {
+  ActionButtonPreset,
+  ActionButtonPresetDefinition,
+} from "./components/actionButtonPresets";
+export {
+  getLinkCardPreset,
+  linkCardPresetDefinitions,
+  linkCardPresetMap,
+} from "./components/linkCardPresets";
+export type {
+  LinkCardPreset,
+  LinkCardPresetDefinition,
+} from "./components/linkCardPresets";
 
 export interface XhhaoComContentWidgetsApi {
   mount: typeof mountCustomElements;
@@ -21,9 +43,15 @@ function mountWhenReady() {
   mountCustomElements();
 }
 
+function remountAfterPageNavigation() {
+  mountCustomElements();
+}
+
 if (typeof window !== "undefined") {
   window.XhhaoComContentWidgets = {
     mount: mountCustomElements,
   };
+
+  document.addEventListener("pjax:complete", remountAfterPageNavigation);
   mountWhenReady();
 }

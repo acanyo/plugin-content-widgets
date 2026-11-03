@@ -1,0 +1,279 @@
+@use "../theme";
+
+.xhhao-com-link-card {
+  --xhhao-com-link-card-accent: var(--xhhao-com-link-card-accent-source, #1769ff);
+  --xhhao-com-link-card-bg: var(--xhhao-com-link-card-bg-source, #fff);
+  --xhhao-com-link-card-text: var(--xhhao-com-link-card-text-source, #1f2937);
+
+  position: relative;
+  isolation: isolate;
+  box-sizing: border-box !important;
+  display: grid !important;
+  grid-template-columns: auto minmax(0, 1fr) auto auto !important;
+  align-items: center !important;
+  gap: 0.75em !important;
+  width: 100% !important;
+  max-width: min(100%, var(--xhhao-com-content-max-width, 1320px)) !important;
+  min-width: 0 !important;
+  min-height: 5rem !important;
+  margin: 1rem auto !important;
+  padding: 0.85em 1em !important;
+  overflow: hidden !important;
+  border: 1px solid var(--xhhao-com-border, #e5e7eb) !important;
+  border-inline-start-width: 1px !important;
+  border-radius: 0.5em !important;
+  background: var(--xhhao-com-link-card-bg) !important;
+  color: var(--xhhao-com-link-card-text) !important;
+
+  box-shadow: none !important;
+  font-family: inherit !important;
+  font-size: inherit !important;
+  font-style: normal !important;
+  font-weight: 400 !important;
+  letter-spacing: normal !important;
+  line-height: normal !important;
+  text-align: start !important;
+  text-decoration: none !important;
+  text-indent: 0 !important;
+  text-shadow: none !important;
+  transition: border-color 160ms ease !important;
+
+  &::before {
+    display: none !important;
+    content: none !important;
+  }
+
+  &::after {
+    display: none !important;
+    content: none !important;
+  }
+
+  &:hover {
+    border-color: color-mix(in srgb, var(--xhhao-com-link-card-accent) 68%, transparent) !important;
+    background: var(--xhhao-com-link-card-bg) !important;
+    color: var(--xhhao-com-link-card-text) !important;
+
+  box-shadow: none !important;
+    text-decoration: none !important;
+  }
+
+  &:focus-visible {
+    outline: 3px solid color-mix(in srgb, var(--xhhao-com-link-card-accent) 38%, transparent) !important;
+    outline-offset: 3px !important;
+  }
+
+  .xhhao-com-link-card-icon,
+  .xhhao-com-link-card-arrow {
+    box-sizing: border-box !important;
+    display: inline-flex !important;
+    flex: 0 0 auto !important;
+    align-items: center !important;
+    justify-content: center !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    color: var(--xhhao-com-link-card-accent) !important;
+    text-decoration: none !important;
+  }
+
+  .xhhao-com-link-card-icon {
+    width: 2.5em !important;
+    height: 2.5em !important;
+    border: 1px solid color-mix(in srgb, var(--xhhao-com-link-card-accent) 32%, transparent) !important;
+    border-radius: 0.4em !important;
+    background: transparent !important;
+    font-size: 1.3rem !important;
+    line-height: 1 !important;
+
+    svg,
+    img {
+      display: block !important;
+      width: 1.45rem !important;
+      height: 1.45rem !important;
+      max-width: none !important;
+      max-height: none !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      border: 0 !important;
+      border-radius: 0 !important;
+      background: transparent !important;
+      object-fit: contain !important;
+    }
+  }
+
+  .xhhao-com-link-card-copy {
+    box-sizing: border-box !important;
+    display: grid !important;
+    gap: 0.22rem !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    color: inherit !important;
+    font: inherit !important;
+    text-decoration: none !important;
+  }
+
+  .xhhao-com-link-card-label {
+    display: block !important;
+    overflow: hidden !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    background: transparent !important;
+    color: var(--xhhao-com-link-card-accent) !important;
+    font-family: inherit !important;
+    font-size: 0.75em !important;
+    font-style: normal !important;
+    font-weight: 400 !important;
+    letter-spacing: normal !important;
+    line-height: 1.2 !important;
+    text-decoration: none !important;
+    text-overflow: ellipsis !important;
+    text-transform: none !important;
+    white-space: nowrap !important;
+  }
+
+  .xhhao-com-link-card-title {
+    display: block !important;
+    overflow: hidden !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    background: transparent !important;
+    color: inherit !important;
+    font-family: inherit !important;
+    font-size: 1em !important;
+    font-style: normal !important;
+    font-weight: 600 !important;
+    letter-spacing: normal !important;
+    line-height: 1.35 !important;
+    text-decoration: none !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+
+  .xhhao-com-link-card-description {
+    display: -webkit-box !important;
+    overflow: hidden !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    background: transparent !important;
+    color: inherit !important;
+    font-family: inherit !important;
+    font-size: 0.875em !important;
+    font-style: normal !important;
+    font-weight: 400 !important;
+    letter-spacing: normal !important;
+    line-height: 1.55 !important;
+    opacity: 0.72 !important;
+    text-decoration: none !important;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  .xhhao-com-link-card-media {
+    box-sizing: border-box !important;
+    display: block !important;
+    width: 7.5rem !important;
+    height: 4.6rem !important;
+    max-width: 7.5rem !important;
+    overflow: hidden !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 0.75rem !important;
+    background: color-mix(in srgb, var(--xhhao-com-link-card-accent) 10%, transparent) !important;
+
+    img {
+      display: block !important;
+      width: 100% !important;
+      height: 100% !important;
+      max-width: none !important;
+      max-height: none !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      border: 0 !important;
+      border-radius: 0 !important;
+      background: transparent !important;
+      object-fit: cover !important;
+    }
+  }
+
+  .xhhao-com-link-card-arrow {
+    width: 2.25rem !important;
+    height: 2.25rem !important;
+    border: 0 !important;
+    border-radius: 999px !important;
+    background: transparent !important;
+    transition:
+      transform 160ms ease,
+      background-color 160ms ease !important;
+
+    svg {
+      display: block !important;
+      width: 1.1rem !important;
+      height: 1.1rem !important;
+      max-width: none !important;
+      max-height: none !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      border: 0 !important;
+      background: transparent !important;
+    }
+  }
+
+  &:hover .xhhao-com-link-card-arrow {
+    background: transparent !important;
+  }
+}
+
+.xhhao-com-link-card-appearance-auto {
+  --xhhao-com-link-card-bg: var(--xhhao-com-link-card-bg-source, var(--xhhao-com-bg-card));
+  --xhhao-com-link-card-text: var(--xhhao-com-link-card-text-source, var(--xhhao-com-text));
+}
+
+@mixin xhhao-com-link-card-dark-surface {
+  --xhhao-com-link-card-accent: color-mix(
+    in srgb,
+    var(--xhhao-com-link-card-accent-source, #1769ff) 72%,
+    #fff
+  );
+  --xhhao-com-link-card-bg: var(--xhhao-com-link-card-bg-source, #18181b);
+  --xhhao-com-link-card-text: var(--xhhao-com-link-card-text-source, #f4f4f5);
+}
+
+.xhhao-com-link-card-appearance-dark {
+  @include xhhao-com-link-card-dark-surface;
+}
+
+.xhhao-com-link-card-appearance-auto {
+  @include theme.when-dark {
+    @include xhhao-com-link-card-dark-surface;
+  }
+}
+
+@media (max-width: 560px) {
+  .xhhao-com-link-card {
+    grid-template-columns: auto minmax(0, 1fr) auto !important;
+    gap: 0.75rem !important;
+    min-height: 5rem !important;
+    padding: 0.85rem !important;
+
+    .xhhao-com-link-card-icon {
+      width: 2.75rem !important;
+      height: 2.75rem !important;
+    }
+
+    .xhhao-com-link-card-description {
+      -webkit-line-clamp: 1;
+    }
+
+    .xhhao-com-link-card-media {
+      display: none !important;
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .xhhao-com-link-card, .xhhao-com-link-card .xhhao-com-link-card-arrow { transition: none !important; }
+}

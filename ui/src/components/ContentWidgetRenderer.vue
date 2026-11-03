@@ -47,6 +47,8 @@ onMounted(() => {
     :is="inline ? 'span' : 'div'"
     ref="rootRef"
     class="content-widget-renderer"
+    :inert="passive || undefined"
+    :aria-hidden="passive ? 'true' : undefined"
     :class="{
       'content-widget-renderer--inline': inline,
       'content-widget-renderer--passive': passive,

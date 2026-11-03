@@ -12,16 +12,18 @@
 
 ![编辑器组件选择](./images/editor.png)
 
+![组件收藏](./images/favorites.png)
+
 ![前台渲染效果](./images/preview.png)
 
 ## 内置组件
 
 当前包含以下组件：
 
-- 提示：提示框、悬浮提示、引用、便签、结果
-- 布局：标签页、折叠面板、分栏、步骤、时间线、卡片列表、对比
+- 提示：提示框、增强提示框、悬浮提示、引用、便签、结果
+- 布局：标签页、折叠面板、分栏、步骤、时间线、卡片列表、外链卡片、对比
 - 代码：复制命令、命令组、快捷键
-- 展示：聊天、图片、PDF 预览、哔哩哔哩视频、进度条、状态、徽标、按钮、任务清单
+- 展示：聊天、图片、PDF 预览、哔哩哔哩视频、进度条、状态、徽标、按钮、增强按钮、任务清单
 - 行内：表情时钟、模糊文本、批注、阅读时间
 
 ## MCP 工具
@@ -52,6 +54,55 @@
 - `type`：状态，可选值为 `tip`、`info`、`question`、`warning`、`error`。
 - `title`：标题。
 - `icon`：自定义图标，支持 SVG 字符串或图片 URL。
+
+### xhhao-com-admonition
+
+独立的增强提示框，正文支持 GitHub Flavored Markdown，同时支持折叠、配色和常用图标，不会改变原有 `xhhao-com-alert`。
+
+```html
+<xhhao-com-admonition type="success" show-title collapsible default-open>
+  这里写提示内容。
+</xhhao-com-admonition>
+```
+
+参数：
+
+- `type`：`tip`、`info`、`warning`、`danger`、`success`、`question`、`example`、`quote`、`bug`。
+- `title`、`show-title`：自定义标题与显示状态。
+- `collapsible`、`default-open`：折叠能力与默认展开状态。
+- `accent-color`、`background-color`、`text-color`：自定义配色。
+- `icon-name`、`icon`：常用图标或自定义 SVG、Emoji、图片 URL。
+
+### xhhao-com-action-button
+
+独立的行内增强按钮，默认使用纯色和小圆角，也可选择渐变、圆角与图标。
+
+```html
+<xhhao-com-action-button
+  href="https://example.com"
+  target="_blank"
+  shape="square"
+  preset="blue-solid"
+  appearance="auto"
+  text-color="#ffffff"
+  icon-name="external-link"
+  icon-position="after"
+>
+  前往访问
+</xhhao-com-action-button>
+```
+
+### xhhao-com-link-card
+
+外链卡片，提供 GitHub、Bilibili、Behance、小红书、新片场、Dribbble、ArtStation、Pinterest 等常用预设，并允许覆盖文案、配色、图标和预览图。编辑器中可以点击“读取网站信息”，由 Halo 服务端读取目标网页的标题、说明、网站图标和预览图；目标网站限制读取时会回退到平台预设，仍可手工修改。
+
+```html
+<xhhao-com-link-card
+  preset="github"
+  href="https://github.com/acanyo/plugin-content-widgets"
+  target="_blank"
+></xhhao-com-link-card>
+```
 
 ### xhhao-com-tab
 
@@ -258,3 +309,5 @@ sh gradlew build
 ## 许可证
 
 [GPL-3.0](./LICENSE) © Handsome
+
+增强提示框的类型与折叠语义参考了 MIT 许可的 [x1renn/hexo-admonition-new](https://github.com/x1renn/hexo-admonition-new)，本项目未引入其 Hexo 转译流程。完整版权与许可说明见 [THIRD_PARTY_NOTICES.md](./THIRD_PARTY_NOTICES.md)。网页元信息读取仅用于编辑器辅助填充，不参与前台渲染时的网络请求。

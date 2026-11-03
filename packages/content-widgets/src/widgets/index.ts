@@ -1,3 +1,6 @@
+import * as actionButton from "./action-button";
+import * as linkCard from "./link-card";
+import * as admonition from "./admonition";
 import * as alert from "./alert";
 import * as annotation from "./annotation";
 import * as badge from "./badge";
@@ -31,6 +34,9 @@ import type { WidgetModule } from "./types";
 // 顺序沿用历史挂载顺序，保证嵌套组件的捕获行为不变
 export const widgets: WidgetModule[] = [
   alert,
+  actionButton,
+  linkCard,
+  admonition,
   badge,
   button,
   tab,

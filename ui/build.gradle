@@ -39,9 +39,10 @@ tasks.register('pnpmGenerateManifest', PnpmTask) {
     group = 'build'
     description = 'Generate the content widget JSON manifest for the JVM MCP tools'
     args = ['--filter', './ui', 'manifest']
-    dependsOn tasks.named('pnpmInstall')
+    dependsOn tasks.named('pnpmBuildWidgets')
     inputs.dir(layout.projectDirectory.dir('src/editor'))
     inputs.dir(layout.projectDirectory.dir('scripts'))
+    inputs.file(rootProject.layout.projectDirectory.file('packages/content-widgets/dist/widget-presets.js'))
     outputs.file(layout.buildDirectory.file('manifest/content-widgets-manifest.json'))
 }
 

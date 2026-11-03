@@ -1,0 +1,71 @@
+<script lang="ts">
+  import { contentWidgetIcons } from "./icons/contentWidgetIcons";
+  import { getActionButtonPreset, type ActionButtonPreset } from "./actionButtonPresets";
+  import ContentWidgetIcon from "./ContentWidgetIcon.svelte";
+  import {
+    safeAppearance,
+    safeColor,
+    safeHref,
+    type ContentWidgetAppearance,
+  } from "./contentWidgetRenderUtils";
+
+  type ButtonShape = "square" | "rounded" | "pill";
+  type IconPosition = "before" | "after" | "none";
+
+  let {
+    href = "#",
+    target = "_self",
+    shape = "square",
+    preset = "blue-solid",
+    icon,
+    iconName = "external-link",
+    iconPosition = "after",
+    gradientStart,
+    gradientEnd,
+    textColor,
+    content = "前往访问",
+    appearance = "custom",
+  }: {
+    href?: string;
+    target?: string;
+    shape?: ButtonShape;
+    preset?: ActionButtonPreset;
+    icon?: string;
+    iconName?: string;
+    iconPosition?: IconPosition;
+    gradientStart?: string;
+    gradientEnd?: string;
+    textColor?: string;
+    content?: string;
+    appearance?: ContentWidgetAppearance;
+  } = $props();
+
+  let rel = $derived(target === "_blank" ? "noopener noreferrer" : undefined);
+  let colorPreset = $derived(getActionButtonPreset(preset));
+  let resolvedAppearance = $derived(safeAppearance(appearance));
+  let customIcon = $derived(icon?.trim() || "");
+  let builtInIcon = $derived(contentWidgetIcons[iconName] || "");
+  let showIcon = $derived(iconPosition !== "none" && Boolean(customIcon || builtInIcon));
+</script>
+
+<a
+  class={`xhhao-com-action-button xhhao-com-action-button-shape-${shape} xhhao-com-action-button-appearance-${resolvedAppearance}`}
+  style:--xhhao-com-action-start={safeColor(gradientStart, colorPreset.gradientStart)}
+  style:--xhhao-com-action-end={safeColor(gradientEnd, colorPreset.gradientEnd)}
+  style:--xhhao-com-action-text={safeColor(textColor, colorPreset.textColor)}
+  href={safeHref(href)}
+  {target}
+  {rel}
+>
+  {#if showIcon && iconPosition === "before"}
+    <span class="xhhao-com-action-button-icon" aria-hidden="true">
+      <ContentWidgetIcon {customIcon} {builtInIcon} />
+    </span>
+  {/if}
+  <span class="xhhao-com-action-button-content">{@html content}</span>
+  {#if showIcon && iconPosition === "after"}
+    <span class="xhhao-com-action-button-icon" aria-hidden="true">
+      <ContentWidgetIcon {customIcon} {builtInIcon} />
+    </span>
+  {/if}
+</a>
