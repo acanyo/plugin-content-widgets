@@ -35,6 +35,16 @@ tasks.register('pnpmBuild', PnpmTask) {
     outputs.dir(layout.buildDirectory.dir('dist'))
 }
 
+tasks.register('pnpmGenerateManifest', PnpmTask) {
+    group = 'build'
+    description = 'Generate the content widget JSON manifest for the JVM MCP tools'
+    args = ['--filter', './ui', 'manifest']
+    dependsOn tasks.named('pnpmInstall')
+    inputs.dir(layout.projectDirectory.dir('src/editor'))
+    inputs.dir(layout.projectDirectory.dir('scripts'))
+    outputs.file(layout.buildDirectory.file('manifest/content-widgets-manifest.json'))
+}
+
 tasks.register('pnpmCheck', PnpmTask) {
     group = 'verification'
     description = 'Run unit tests for the UI project using pnpm'
