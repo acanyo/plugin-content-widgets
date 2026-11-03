@@ -146,7 +146,7 @@ function updateWidget(nextWidget: ContentWidgetNodeAttrs) {
       >
         <span class="content-widget-node__editor-head">
           <strong>{{ title }}</strong>
-          <em>{{ isInline ? '行内组件' : '块级组件' }}</em>
+          <span class="content-widget-node__kind">{{ isInline ? '行内组件' : '块级组件' }}</span>
         </span>
 
         <template v-if="hasEditableFields">
@@ -258,15 +258,11 @@ function updateWidget(nextWidget: ContentWidgetNodeAttrs) {
   line-height: 1.4;
 }
 
-.content-widget-node__editor-head em {
+.content-widget-node__kind {
   flex: 0 0 auto;
-  padding: 2px 7px;
-  border-radius: 5px;
-  background: #f1f5f9;
   color: var(--cw-editor-muted);
-  font-style: normal;
-  font-weight: 600;
-  font-size: 11px;
+  font-weight: 400;
+  font-size: 12px;
   line-height: 1.4;
 }
 

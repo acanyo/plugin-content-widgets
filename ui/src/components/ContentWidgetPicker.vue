@@ -142,10 +142,7 @@ onBeforeUnmount(() => window.removeEventListener('storage', handleStorage))
               <span class="content-widget-picker__item-copy">
                 <span class="content-widget-picker__item-head">
                   <strong :id="`content-widget-title-${widget.id}`">{{ widget.title }}</strong>
-                  <span
-                    class="content-widget-picker__kind"
-                    :class="`content-widget-picker__kind--${widget.kind}`"
-                  >
+                  <span class="content-widget-picker__kind">
                     {{ widget.kind === 'inline' ? '行内' : '块级' }}
                   </span>
                 </span>
@@ -284,8 +281,9 @@ onBeforeUnmount(() => window.removeEventListener('storage', handleStorage))
   min-width: 0;
   height: 34px;
   padding: 0 10px;
-  border: 1px solid transparent;
-  border-radius: 6px;
+  border: none;
+  border-inline-start: 2px solid transparent;
+  border-radius: 0;
   background: transparent;
   color: var(--cw-editor-text);
   cursor: pointer;
@@ -300,11 +298,10 @@ onBeforeUnmount(() => window.removeEventListener('storage', handleStorage))
 }
 
 .content-widget-picker__sidebar button.is-active {
-  border-color: var(--cw-editor-border);
-  background: var(--cw-editor-bg);
-  color: var(--cw-editor-accent);
+  border-inline-start-color: var(--cw-editor-text);
+  background: transparent;
+  color: var(--cw-editor-text);
   font-weight: 600;
-  box-shadow: none;
 }
 
 .content-widget-picker__sidebar em {
@@ -452,21 +449,10 @@ onBeforeUnmount(() => window.removeEventListener('storage', handleStorage))
 
 .content-widget-picker__kind {
   flex: 0 0 auto;
-  padding: 2px 7px;
-  border-radius: 5px;
-  font-size: 11px;
-  font-weight: 600;
+  color: var(--cw-editor-muted);
+  font-size: 12px;
+  font-weight: 400;
   line-height: 1.4;
-}
-
-.content-widget-picker__kind--inline {
-  background: var(--cw-editor-accent-soft);
-  color: var(--cw-editor-accent);
-}
-
-.content-widget-picker__kind--block {
-  background: var(--cw-editor-hover);
-  color: var(--cw-editor-text);
 }
 
 .content-widget-picker__item-desc {
@@ -516,6 +502,12 @@ onBeforeUnmount(() => window.removeEventListener('storage', handleStorage))
 
   .content-widget-picker__sidebar button {
     flex: 0 0 auto;
+    border-inline-start: none;
+    border-bottom: 2px solid transparent;
+  }
+
+  .content-widget-picker__sidebar button.is-active {
+    border-bottom-color: var(--cw-editor-text);
   }
 }
 </style>
