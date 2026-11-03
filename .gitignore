@@ -78,5 +78,7 @@ application-local.properties
 /ui/build/
 /workplace/
 /src/main/resources/console/
+/src/main/resources/static/
 openspec/
 **/openspec/
+packages/content-widgets/dist-browser/

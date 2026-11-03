@@ -1,8 +1,10 @@
 <script lang="ts" setup>
 import { NodeSelection, NodeViewWrapper, nodeViewProps } from '@halo-dev/richtext-editor'
 import { computed } from 'vue'
-import { getContentWidgetEditorFields } from '@/editor/content-widget-editor-fields'
-import { getContentWidgetDefinitionByTagName } from '@/editor/content-widget-registry'
+import {
+  getContentWidgetDefinitionByTagName,
+  getContentWidgetEditorFields,
+} from '@/editor/content-widget-registry'
 import type { ContentWidgetNodeAttrs } from '@/editor/content-widget-types'
 import ContentWidgetEditorField from './ContentWidgetEditorField.vue'
 import ContentWidgetRenderer from './ContentWidgetRenderer.vue'

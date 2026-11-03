@@ -1,4 +1,3 @@
-import "./styles/index.scss";
 import { mountCustomElements } from "./mount/mountCustomElements";
 
 export { mountCustomElements };

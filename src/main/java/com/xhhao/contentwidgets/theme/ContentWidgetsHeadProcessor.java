@@ -19,6 +19,16 @@ public class ContentWidgetsHeadProcessor implements TemplateHeadProcessor {
     static final PropertyPlaceholderHelper PROPERTY_PLACEHOLDER_HELPER =
         new PropertyPlaceholderHelper("${", "}");
 
+    // 与 packages/content-widgets/src/loader/registry.ts 中的标签保持一致
+    static final String WIDGET_TAGS =
+        "xhhao-com-alert,xhhao-com-badge,xhhao-com-button,xhhao-com-tab,xhhao-com-copy,"
+            + "xhhao-com-folding,xhhao-com-tip,xhhao-com-blur,xhhao-com-timeline,xhhao-com-quote,"
+            + "xhhao-com-chat,xhhao-com-task-list,xhhao-com-key,xhhao-com-card-list,xhhao-com-pdf,"
+            + "xhhao-com-bilibili,xhhao-com-pic,xhhao-com-progress,xhhao-com-emoji-clock,"
+            + "xhhao-com-status,xhhao-com-annotation,xhhao-com-command-group,xhhao-com-result,"
+            + "xhhao-com-reading-time,xhhao-com-compare,xhhao-com-split,xhhao-com-stepper,"
+            + "xhhao-com-note";
+
     private final PluginContext pluginContext;
 
     @Override
@@ -33,11 +43,16 @@ public class ContentWidgetsHeadProcessor implements TemplateHeadProcessor {
         final Properties properties = new Properties();
         properties.setProperty("name", pluginContext.getName());
         properties.setProperty("version", pluginContext.getVersion());
+        properties.setProperty("widgetTags", WIDGET_TAGS);
 
         return PROPERTY_PLACEHOLDER_HELPER.replacePlaceholders("""
             <!-- plugin-content-widgets start -->
-            <script src="/plugins/${name}/assets/static/content-widgets.iife.js?version=${version}"></script>
-            <link rel="stylesheet" href="/plugins/${name}/assets/static/content-widgets.css?version=${version}" />
+            <style id="xhhao-com-widgets-fouc">
+            ${widgetTags}{visibility:hidden}
+            @media print{${widgetTags}{visibility:visible}}
+            </style>
+            <noscript><style>${widgetTags}{visibility:visible!important}</style></noscript>
+            <script type="module" src="/plugins/${name}/assets/static/content-widgets-loader.js?version=${version}"></script>
             <!-- plugin-content-widgets end -->
             """, properties);
     }

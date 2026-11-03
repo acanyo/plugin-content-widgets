@@ -3,7 +3,7 @@ import type { ContentWidgetDefinition, ContentWidgetNodeAttrs } from './content-
 export function definitionToNodeAttrs(definition: ContentWidgetDefinition): ContentWidgetNodeAttrs {
   return {
     tagName: definition.tagName,
-    attributes: { ...(definition.attributes || {}) },
+    attributes: { ...definition.attributes },
     innerHTML: definition.innerHTML || '',
     title: definition.title,
   }

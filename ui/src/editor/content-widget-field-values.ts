@@ -155,7 +155,7 @@ export function setContentWidgetFieldValue(
 
   if (field.source === 'children') {
     const items = Array.isArray(value) ? value : []
-    const nextAttributes = { ...(attrs.attributes || {}) }
+    const nextAttributes = { ...attrs.attributes }
 
     if (field.syncAttributeFromItems) {
       const syncedValue = items
@@ -177,7 +177,7 @@ export function setContentWidgetFieldValue(
     }
   }
 
-  const nextAttributes = { ...(attrs.attributes || {}) }
+  const nextAttributes = { ...attrs.attributes }
 
   if (field.type === 'checkbox') {
     if (value) {

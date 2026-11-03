@@ -29,7 +29,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "vite build --config vite.config.lib.ts",
+    "build": "vite build --config vite.config.lib.ts && vite build --config vite.config.browser.ts",
     "check": "svelte-check --tsconfig ./tsconfig.app.json && tsc -p tsconfig.node.json",
     "dev": "vite",
     "preview": "vite preview",
