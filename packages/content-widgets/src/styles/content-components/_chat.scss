@@ -125,6 +125,7 @@
     box-shadow: 0 0.28em 0.8em var(--xhhao-com-shadow);
     color: var(--xhhao-com-text);
     line-height: 1.65;
+    white-space: pre-wrap;
     overflow-wrap: anywhere;
 
     > *:first-child { margin-top: 0; }
@@ -150,6 +151,8 @@
     }
 
     > * { margin: 0; }
+
+    > div { white-space: pre-wrap; }
   }
 }
 

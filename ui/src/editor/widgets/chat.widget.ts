@@ -31,7 +31,7 @@ export default defineWidget({
         listItemAttrField('badge', '徽标', 'text', '作者'),
         listItemAttrField('self', '自己', 'checkbox'),
         listItemAttrField('system', '系统消息', 'checkbox'),
-        listItemContentField('消息内容', '这里写消息内容。'),
+        listItemContentField('消息内容', '支持直接回车换行'),
       ],
     }),
   ],
