@@ -1,5 +1,5 @@
 @mixin when-dark {
-  :where(.dark, .color-scheme-dark, [data-color-scheme="dark"], [data-theme="dark"]) & {
+  :is(.dark, .color-scheme-dark, [data-color-scheme="dark"], [data-theme="dark"]) & {
     @content;
   }
 
